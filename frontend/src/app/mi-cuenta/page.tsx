@@ -92,12 +92,17 @@ export default function ClientDashboard() {
         </div>
 
         <nav style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', flexGrow: 1}}>
-          <div style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: 'var(--primary-orange-light)', color: 'var(--primary-orange)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+          <div onClick={() => setChatOpen(false)} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: !chatOpen ? 'var(--primary-orange-light)' : 'transparent', color: !chatOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Home size={18}/> Mi Inicio
           </div>
-          <div style={{padding: '0.8rem 1rem', borderRadius: '8px', color: '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
-            <ClipboardList size={18}/> Mis Solicitudes
+          <div onClick={() => setChatOpen(true)} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: chatOpen ? 'var(--primary-orange-light)' : 'transparent', color: chatOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+            <Bot size={18}/> Huellitas AI
           </div>
+          <Link href="/#adoptar" style={{textDecoration: 'none'}}>
+            <div style={{padding: '0.8rem 1rem', borderRadius: '8px', color: '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+              <Dog size={18}/> Catálogo de Perros
+            </div>
+          </Link>
           <div style={{padding: '0.8rem 1rem', borderRadius: '8px', color: '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Settings size={18}/> Mi Perfil
           </div>
@@ -148,9 +153,9 @@ export default function ClientDashboard() {
             </button>
           </div>
         ) : (
-          <div style={{backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '16px', display: 'flex', flexDirection: 'column', height: '400px', marginBottom: '2.5rem', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.05)'}}>
+          <div style={{backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '16px', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 180px)', marginBottom: '2.5rem', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.05)'}}>
             <div style={{backgroundColor: 'var(--primary-orange)', padding: '1rem', color: 'white', fontWeight: 700, display: 'flex', justifyContent: 'space-between'}}>
-              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Bot size={20}/> Huellitas AI (Motor LLaMA 3)</div>
+              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Bot size={20}/> Huellitas AI</div>
               <button onClick={() => setChatOpen(false)} style={{background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 700}}>X Cerrar</button>
             </div>
             <div style={{flexGrow: 1, padding: '1.5rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem'}}>
@@ -167,7 +172,7 @@ export default function ClientDashboard() {
                         {mentionedDogs.map(dog => (
                           <div key={dog.id} style={{minWidth: '120px', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '8px', backgroundColor: '#fff', color: '#334155'}}>
                             {dog.photo_url ? (
-                              <img src={dog.photo_url} style={{width: '100%', height: '70px', objectFit: 'cover', borderRadius: '4px', marginBottom: '8px'}} alt={dog.name} />
+                              <img src={dog.photo_url} style={{width: '100%', height: '70px', objectFit: 'contain', backgroundColor: '#f1f5f9', borderRadius: '4px', marginBottom: '8px'}} alt={dog.name} />
                             ) : (
                               <div style={{width: '100%', height: '70px', backgroundColor: '#e2e8f0', borderRadius: '4px', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Dog color="#94a3b8"/></div>
                             )}
@@ -189,7 +194,8 @@ export default function ClientDashboard() {
           </div>
         )}
 
-        <div style={{display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem'}}>
+        {!chatOpen && (
+          <div style={{display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem'}}>
           
           {/* --- TRACKER DE ADOPCIÓN --- */}
           <div>
@@ -295,7 +301,8 @@ export default function ClientDashboard() {
             </div>
           </div>
 
-        </div>
+          </div>
+        )}
       </main>
     </div>
   );
