@@ -8,8 +8,20 @@ import styles from './page.module.css';
 
 export default function PublicLanding() {
   const [dogs, setDogs] = useState<any[]>([]);
+  const [session, setSession] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string>('adoptante');
   
   useEffect(() => {
+    // Verificar si hay sesión iniciada
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setSession(session);
+        supabase.from('profiles').select('role').eq('id', session.user.id).single().then(({data}) => {
+          if (data) setUserRole(data.role);
+        });
+      }
+    });
+
     // Obtenemos a todos los perritos de la base de datos
     supabase.from('dogs').select('*').then(({ data }) => {
       if (data) setDogs(data);
@@ -28,7 +40,11 @@ export default function PublicLanding() {
           <Link href="#adoptar" className={styles.navLink}>Adoptar</Link>
           <Link href="#" className={styles.navLink}>Nosotros</Link>
           <Link href="#" className={styles.navLink}>Donar</Link>
-          <Link href="/login" className={styles.loginBtn}>Iniciar Sesión</Link>
+          {session ? (
+            <Link href={userRole === 'admin' ? '/dashboard' : '/mi-cuenta'} className={styles.loginBtn}>Mi Portal</Link>
+          ) : (
+            <Link href="/login" className={styles.loginBtn}>Iniciar Sesión</Link>
+          )}
         </div>
       </nav>
 
@@ -72,8 +88,8 @@ export default function PublicLanding() {
                   </div>
                 </div>
 
-                {/* Por ahora los mandamos a Iniciar Sesión para que apliquen */}
-                <Link href="/login" className={styles.adoptBtn}>
+                {/* Si tiene sesión, va a su portal, si no al login */}
+                <Link href={session ? (userRole === 'admin' ? '/dashboard' : '/mi-cuenta') : "/login"} className={styles.adoptBtn}>
                   <Heart size={18} style={{display:'inline', verticalAlign:'middle', marginRight:'6px'}}/>
                   ¡Quiero Adoptarlo!
                 </Link>

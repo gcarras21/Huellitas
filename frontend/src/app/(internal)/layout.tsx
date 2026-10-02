@@ -24,16 +24,15 @@ export default function InternalLayout({ children }: { children: React.ReactNode
     });
   }, []);
 
-  const navItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
-    { name: 'Dogs', icon: Dog, href: '/perros' },
-    { name: 'Adoption Applications', icon: ClipboardList, href: '/solicitudes' },
-    { name: 'Foster Homes', icon: Home, href: '/foster' },
-    { name: 'Health & Medical', icon: HeartPulse, href: '/health' },
-    { name: 'Events', icon: Calendar, href: '/events' },
-    { name: 'Reports', icon: BarChart2, href: '/reports' },
-    { name: 'Staff', icon: Users, href: '/usuarios' },
-    { name: 'AI Metrics', icon: Sparkles, href: '/ai-metrics' },
+    { name: 'Perros', icon: Dog, href: '/perros' },
+    { name: 'Solicitudes', icon: ClipboardList, href: '/solicitudes' },
+    { name: 'Hogares Temporales', icon: Home, href: '/foster' },
+    { name: 'Salud', icon: HeartPulse, href: '/health' },
+    { name: 'Eventos', icon: Calendar, href: '/events' },
+    { name: 'Reportes', icon: BarChart2, href: '/reports' },
+    { name: 'Personal', icon: Users, href: '/usuarios' },
+    { name: 'Métricas IA', icon: Sparkles, href: '/ai-metrics' },
   ];
 
   return (
@@ -44,7 +43,7 @@ export default function InternalLayout({ children }: { children: React.ReactNode
           <Dog size={28} color="var(--primary-orange)" />
           <div>
             <span>Huellitas</span> AI
-            <div style={{fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 400}}>Rescue Platform</div>
+            <div style={{fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 400}}>Plataforma de Rescate</div>
           </div>
         </div>
         
@@ -69,7 +68,7 @@ export default function InternalLayout({ children }: { children: React.ReactNode
             <Users size={18}/> Portal de Adoptante
           </Link>
           <Link href="/settings" className="nav-item" style={{marginTop: '1rem'}}><Settings size={18}/> Configuración</Link>
-          <div className="nav-item"><HelpCircle size={18}/> Need help?</div>
+          <div className="nav-item"><HelpCircle size={18}/> ¿Necesitas ayuda?</div>
         </div>
 
         <div className="user-profile" style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
@@ -77,7 +76,7 @@ export default function InternalLayout({ children }: { children: React.ReactNode
             <img className="avatar" src="https://i.pravatar.cc/150?img=11" alt="Gabriel" />
             <div>
               <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>Gabriel</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Administrator</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Administrador</div>
             </div>
           </div>
           <button onClick={handleLogout} style={{background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px'}} title="Cerrar Sesión">
@@ -98,7 +97,7 @@ export default function InternalLayout({ children }: { children: React.ReactNode
             <div className="ai-header-icon"><Bot size={20} /></div>
             <div className="ai-header-info">
               <h3>Huellitas AI</h3>
-              <p><span className="status-dot"></span> Online</p>
+              <p><span className="status-dot"></span> En línea</p>
             </div>
           </div>
           <button className="ai-close-btn" onClick={() => setIsAiOpen(false)}><X size={20}/></button>
@@ -106,11 +105,11 @@ export default function InternalLayout({ children }: { children: React.ReactNode
         
         <div className="ai-chat-area">
           <div className="chat-bubble user">
-            Which dogs are available for adoption and are good with children?
+            ¿Qué perros están disponibles para adopción y son buenos con los niños?
           </div>
           
           <div className="chat-bubble ai">
-            Based on the information in the platform, here are the dogs that could be a good match for families with children:
+            Basado en la información de la plataforma, aquí hay perros que podrían ser ideales para familias con niños:
             
             {/* Dynamic Mini cards inside chat */}
             <div style={{display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px'}}>
@@ -133,21 +132,21 @@ export default function InternalLayout({ children }: { children: React.ReactNode
           </div>
           
           <div className="chat-bubble user">
-            What vaccines does {aiDogs[0]?.name || 'Luna'} need and when?
+            ¿Qué vacunas necesita {aiDogs[0]?.name || 'Luna'} y cuándo?
           </div>
           <div className="chat-bubble ai">
-            {aiDogs[0]?.name || 'Luna'} has the following pending vaccines:
+            {aiDogs[0]?.name || 'Luna'} tiene las siguientes vacunas pendientes:
             <ul style={{margin: '8px 0 8px 16px', fontSize: '0.85rem'}}>
-              <li><strong style={{color: 'var(--urgent-red)'}}>Rabies vaccine</strong> - due today</li>
-              <li><strong style={{color: 'var(--primary-orange)'}}>DHPP booster</strong> - due in 2 weeks</li>
+              <li><strong style={{color: 'var(--urgent-red)'}}>Vacuna contra la rabia</strong> - hoy</li>
+              <li><strong style={{color: 'var(--primary-orange)'}}>Refuerzo DHPP</strong> - en 2 semanas</li>
             </ul>
-            Would you like me to add this to your task list?
+            ¿Quieres que lo agregue a tus tareas?
           </div>
         </div>
 
         <div className="ai-input-area">
           <div className="ai-input-wrapper">
-            <input type="text" placeholder="Ask anything about dogs..." />
+            <input type="text" placeholder="Pregunta algo sobre los perros..." />
             <button><Send size={16} /></button>
           </div>
         </div>
