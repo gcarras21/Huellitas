@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { LayoutDashboard, Dog, ClipboardList, Home, HeartPulse, Calendar, BarChart2, FileText, Settings, HelpCircle, Send, LogOut, Users, X, Bot } from 'lucide-react';
+import { LayoutDashboard, Dog, ClipboardList, Home, HeartPulse, Calendar, BarChart2, FileText, Settings, HelpCircle, Send, LogOut, Users, X, Bot, Globe } from 'lucide-react';
 
 export default function InternalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -61,6 +61,9 @@ export default function InternalLayout({ children }: { children: React.ReactNode
         </nav>
         
         <div style={{marginTop: '2rem'}}>
+          <Link href="/" className="nav-item" style={{color: 'var(--primary-orange)', fontWeight: 600}}>
+            <Globe size={18}/> Ver Portal Público
+          </Link>
           <div className="nav-item"><Settings size={18}/> Settings</div>
           <div className="nav-item"><HelpCircle size={18}/> Need help?</div>
         </div>
