@@ -43,8 +43,8 @@ export default function UsuariosPage() {
   const getRoleBadge = (role: string) => {
     const r = role?.toLowerCase() || 'client';
     if (r === 'admin') return { bg: '#f3f0ff', color: '#722ed1', text: 'ADMINISTRADOR', icon: <Shield size={12}/> };
+    if (r === 'supervisor') return { bg: '#f6ffed', color: '#52c41a', text: 'SUPERVISOR', icon: <Shield size={12}/> };
     if (r === 'staff') return { bg: '#e6f7ff', color: '#1890ff', text: 'STAFF', icon: <Users size={12}/> };
-    if (r === 'vet') return { bg: '#f6ffed', color: '#52c41a', text: 'VETERINARIO', icon: <Plus size={12}/> };
     return { bg: '#f1f5f9', color: '#64748b', text: 'CLIENTE', icon: null };
   };
 
@@ -131,8 +131,8 @@ export default function UsuariosPage() {
                 <label style={{fontSize:'0.85rem', color:'var(--text-muted)', display:'block', marginBottom:'8px', fontWeight: 600}}>Asignar Nuevo Rol</label>
                 <select value={newRole} onChange={e => setNewRole(e.target.value)} style={{padding:'0.75rem', borderRadius:'8px', border:'1px solid var(--border-color)', width:'100%', fontFamily:'inherit', fontWeight: 600}}>
                   <option value="client">Cliente / Adoptante</option>
-                  <option value="staff">Staff (Voluntario)</option>
-                  <option value="vet">Veterinario</option>
+                  <option value="staff">Staff (Operativo)</option>
+                  <option value="supervisor">Supervisor</option>
                   <option value="admin">Administrador Total</option>
                 </select>
               </div>
@@ -164,7 +164,7 @@ export default function UsuariosPage() {
               <strong>Instrucciones:</strong><br/>
               1. Pide a tu colega que entre al <b>Portal Público</b> y se registre usando el botón de Iniciar Sesión.<br/>
               2. Una vez que cree su cuenta, aparecerá aquí en este directorio.<br/>
-              3. Dale clic al botón de <b>Editar</b> junto a su nombre y cámbiale el rol a <b>Staff</b>, <b>Veterinario</b> o <b>Admin</b>.
+              3. Dale clic al botón de <b>Editar</b> junto a su nombre y cámbiale el rol a <b>Staff</b>, <b>Supervisor</b> o <b>Admin</b>.
             </p>
 
             <button onClick={() => setIsInviteModalOpen(false)} className={styles.btnPrimary}>
