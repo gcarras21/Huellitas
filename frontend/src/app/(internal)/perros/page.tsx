@@ -223,12 +223,32 @@ export default function PerrosPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div className={styles.formGroup}>
                   <label>Raza (Sugerido para ML)</label>
-                  <input type="text" name="breed" value={formData.breed} onChange={handleInputChange} placeholder="Ej. Labrador, Mestizo" />
+                  <select name="breed" value={formData.breed} onChange={handleInputChange}>
+                    <option value="">Selecciona Raza</option>
+                    <option value="Mestizo">Mestizo</option>
+                    <option value="Labrador / Golden">Labrador / Golden</option>
+                    <option value="Chihuahua / Pomerania">Chihuahua / Pomerania</option>
+                    <option value="Pastor Alemán / Belga">Pastor Alemán / Belga</option>
+                    <option value="Pitbull / Bull Terrier">Pitbull / Bull Terrier</option>
+                    <option value="Poodle / Maltés">Poodle / Maltés</option>
+                    <option value="Husky / Malamute">Husky / Malamute</option>
+                    <option value="Schnauzer / Terrier">Schnauzer / Terrier</option>
+                    <option value="Otro">Otro</option>
+                  </select>
                 </div>
                 
                 <div className={styles.formGroup}>
                   <label>Color dominante</label>
-                  <input type="text" name="color" value={formData.color} onChange={handleInputChange} placeholder="Ej. Negro, Café Claro" />
+                  <select name="color" value={formData.color} onChange={handleInputChange}>
+                    <option value="">Selecciona Color</option>
+                    <option value="Negro">Negro</option>
+                    <option value="Blanco">Blanco</option>
+                    <option value="Café / Canela">Café / Canela</option>
+                    <option value="Manchado (Blanco y Negro/Café)">Manchado (Blanco y Negro/Café)</option>
+                    <option value="Atigrado (Brindle)">Atigrado (Brindle)</option>
+                    <option value="Gris / Cenizo">Gris / Cenizo</option>
+                    <option value="Otro">Otro</option>
+                  </select>
                 </div>
               </div>
 
@@ -281,12 +301,27 @@ export default function PerrosPage() {
 
               <div className={styles.formGroup}>
                 <label>Temperamento (Actitud)</label>
-                <input type="text" name="temperament" value={formData.temperament} onChange={handleInputChange} placeholder="Ej. Juguetón, Tímido, Protector, Cariñoso" />
+                <select name="temperament" value={formData.temperament} onChange={handleInputChange}>
+                  <option value="">Selecciona Temperamento</option>
+                  <option value="Juguetón / Activo">Juguetón / Activo</option>
+                  <option value="Tranquilo / Relajado">Tranquilo / Relajado</option>
+                  <option value="Tímido / Miedoso">Tímido / Miedoso</option>
+                  <option value="Protector / Guardián">Protector / Guardián</option>
+                  <option value="Cariñoso / Apegado">Cariñoso / Apegado</option>
+                  <option value="Independiente">Independiente</option>
+                </select>
               </div>
 
               <div className={styles.formGroup}>
                 <label>Estado de Salud (Notas Médicas)</label>
-                <input type="text" name="health_status" value={formData.health_status} onChange={handleInputChange} placeholder="Ej. Vacunas de rabia pendientes, Saludable" />
+                <select name="health_status" value={formData.health_status} onChange={handleInputChange}>
+                  <option value="">Selecciona Estado de Salud</option>
+                  <option value="Completamente Sano">Completamente Sano</option>
+                  <option value="En Tratamiento (Leve)">En Tratamiento (Leve)</option>
+                  <option value="Condición Crónica / Especial">Condición Crónica / Especial</option>
+                  <option value="Recuperándose de Cirugía">Recuperándose de Cirugía</option>
+                  <option value="Vacunas / Desparasitación Pendiente">Vacunas / Desparasitación Pendiente</option>
+                </select>
               </div>
 
               <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
