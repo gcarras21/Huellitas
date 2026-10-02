@@ -1,0 +1,158 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.layout {
+  display: flex;
+  gap: 1.5rem;
+  flex-grow: 1;
+  overflow: hidden;
+  height: calc(100vh - 180px);
+}
+
+.sidebar {
+  flex: 0 0 320px;
+  background: white;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.dogItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.dogItem:hover {
+  background-color: #f8fafc;
+}
+.dogItem.active {
+  background-color: var(--primary-orange-light);
+  border-right: 3px solid var(--primary-orange);
+}
+
+.dogAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #eee;
+}
+
+.content {
+  flex: 1;
+  background: white;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.contentHeader {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fdfdfd;
+}
+
+.timeline {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.recordItem {
+  display: flex;
+  gap: 1rem;
+}
+
+.recordIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-dark);
+}
+.recordIcon.vaccine { background-color: var(--success-green-light); color: var(--success-green); }
+.recordIcon.surgery { background-color: var(--urgent-red-light); color: var(--urgent-red); }
+.recordIcon.deworming { background-color: #e0f2fe; color: #0284c7; }
+
+.recordDetails {
+  flex: 1;
+  background: #f8fafc;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.recordTitle {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 8px;
+  color: var(--text-dark);
+}
+.recordDate {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.btnAdd {
+  background-color: var(--primary-orange);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.2s;
+}
+.btnAdd:hover {
+  transform: translateY(-2px);
+}
+
+/* Modal styles */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modalContent {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+}
