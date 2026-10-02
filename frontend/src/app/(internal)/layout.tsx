@@ -4,12 +4,13 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { LayoutDashboard, Dog, ClipboardList, Home, HeartPulse, Calendar, BarChart2, FileText, Settings, HelpCircle, Send, LogOut, Users } from 'lucide-react';
+import { LayoutDashboard, Dog, ClipboardList, Home, HeartPulse, Calendar, BarChart2, FileText, Settings, HelpCircle, Send, LogOut, Users, X, Bot } from 'lucide-react';
 
 export default function InternalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [aiDogs, setAiDogs] = useState<any[]>([]);
+  const [isAiOpen, setIsAiOpen] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -84,13 +85,16 @@ export default function InternalLayout({ children }: { children: React.ReactNode
       </main>
 
       {/* --- RIGHT AI PANEL --- */}
-      <aside className="ai-panel">
+      <aside className={`ai-panel ${isAiOpen ? 'open' : ''}`}>
         <div className="ai-header">
-          <div className="ai-header-icon"><Dog size={20} /></div>
-          <div className="ai-header-info">
-            <h3>Huellitas AI Assistant</h3>
-            <p><span className="status-dot"></span> Online</p>
+          <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
+            <div className="ai-header-icon"><Bot size={20} /></div>
+            <div className="ai-header-info">
+              <h3>Huellitas AI</h3>
+              <p><span className="status-dot"></span> Online</p>
+            </div>
           </div>
+          <button className="ai-close-btn" onClick={() => setIsAiOpen(false)}><X size={20}/></button>
         </div>
         
         <div className="ai-chat-area">
@@ -141,6 +145,13 @@ export default function InternalLayout({ children }: { children: React.ReactNode
           </div>
         </div>
       </aside>
+
+      {/* Floating AI Button when closed */}
+      {!isAiOpen && (
+        <button className="ai-toggle-btn" onClick={() => setIsAiOpen(true)} title="Abrir Asistente IA">
+          <Bot size={24} />
+        </button>
+      )}
     </div>
   );
 }
