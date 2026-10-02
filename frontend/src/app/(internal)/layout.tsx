@@ -67,7 +67,7 @@ export default function InternalLayout({ children }: { children: React.ReactNode
           <Link href="/mi-cuenta" className="nav-item" style={{color: 'var(--primary-orange)', fontWeight: 600}}>
             <Users size={18}/> Portal de Adoptante
           </Link>
-          <div className="nav-item" style={{marginTop: '1rem'}}><Settings size={18}/> Settings</div>
+          <Link href="/settings" className="nav-item" style={{marginTop: '1rem'}}><Settings size={18}/> Configuración</Link>
           <div className="nav-item"><HelpCircle size={18}/> Need help?</div>
         </div>
 
