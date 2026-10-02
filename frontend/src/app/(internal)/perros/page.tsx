@@ -181,7 +181,7 @@ export default function PerrosPage() {
                   {dog.age_months !== null && <span className={styles.tag}>{dog.age_months} meses</span>}
                   {dog.good_with_kids && <span className={styles.tag} style={{background: 'var(--success-green-light)', color: 'var(--success-green)', borderColor: 'var(--success-green)'}}>Kids Friendly</span>}
                 </div>
-                <p style={{fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.5}}>
+                <p style={{fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5}}>
                   <strong>Raza:</strong> {dog.breed || 'Mestizo'} | <strong>Color:</strong> {dog.color || 'No especificado'}<br/>
                   <strong>Temperamento:</strong> {dog.temperament || 'No especificado'}<br/>
                   <strong>Salud:</strong> {dog.health_status || 'No especificado'}
