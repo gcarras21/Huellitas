@@ -19,6 +19,7 @@ export default function ClientDashboard() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [fullNameInput, setFullNameInput] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   
   const [messages, setMessages] = useState<{role: string, content: string}[]>([
     {role: 'ai', content: '¡Hola! Soy Huellitas AI, tu asistente experto en adopciones. Cuéntame, ¿qué tipo de perrito estás buscando o cómo es tu estilo de vida?'}
@@ -85,8 +86,19 @@ export default function ClientDashboard() {
   const updateProfile = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
+    
     await supabase.from('profiles').update({ full_name: fullNameInput }).eq('id', session.user.id);
     setUserName(fullNameInput.split(' ')[0]);
+    
+    if (newPassword.trim().length > 0) {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        alert('Error al actualizar contraseña: ' + error.message);
+        return;
+      }
+      setNewPassword('');
+    }
+    
     alert('Perfil actualizado con éxito');
   };
 
@@ -250,6 +262,15 @@ export default function ClientDashboard() {
                    <label style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem'}}>Correo Electrónico (No modificable)</label>
                    <input type="email" value={userEmail} readOnly style={{width: '100%', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', color: '#94a3b8', fontFamily: 'inherit', fontSize: '1rem', cursor: 'not-allowed', outline: 'none'}} />
                  </div>
+
+                 <div style={{borderTop: '1px solid #e2e8f0', margin: '0.5rem 0'}}></div>
+                 
+                 <div>
+                   <label style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem'}}>Cambiar Contraseña</label>
+                   <input type="password" placeholder="Escribe tu nueva contraseña..." value={newPassword} onChange={e => setNewPassword(e.target.value)} style={{width: '100%', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit', fontSize: '1rem', outline: 'none'}} />
+                   <div style={{fontSize: '0.75rem', color: '#94a3b8', marginTop: '6px'}}>Déjalo en blanco si no deseas cambiarla.</div>
+                 </div>
+
                  <button onClick={updateProfile} style={{backgroundColor: 'var(--primary-orange)', color: 'white', border: 'none', padding: '0.8rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', marginTop: '0.5rem'}}>
                    Guardar Cambios
                  </button>
