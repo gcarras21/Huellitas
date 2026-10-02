@@ -3,4 +3,4 @@ uvicorn
 supabase
 pydantic
 python-dotenv
-openai
+groq
