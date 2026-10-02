@@ -204,7 +204,7 @@ export default function ClientDashboard() {
              <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.5rem'}}>
                {allDogs.map(dog => (
                  <div key={dog.id} style={{backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.02)'}}>
-                   <img src={dog.photo_url || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop"} alt={dog.name} style={{width: '100%', height: '180px', objectFit: 'cover'}} />
+                   <img src={dog.photo_url || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop"} alt={dog.name} style={{width: '100%', height: '180px', objectFit: 'contain', backgroundColor: '#f1f5f9'}} />
                    <div style={{padding: '1rem'}}>
                      <h3 style={{fontSize: '1.1rem', fontWeight: 700, margin: '0 0 0.5rem 0', color: '#1e293b'}}>{dog.name}</h3>
                      <div style={{display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '0.75rem'}}>
