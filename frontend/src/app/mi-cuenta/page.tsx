@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { FileUp, Sparkles, Dog, CheckCircle2, Circle, Clock, Home, ClipboardList, Settings, LogOut, ArrowLeftRight } from 'lucide-react';
+import { FileUp, Sparkles, Dog, CheckCircle2, Circle, Clock, Home, ClipboardList, Settings, LogOut, ArrowLeftRight, Bot, Send, User } from 'lucide-react';
 
 export default function ClientDashboard() {
   const router = useRouter();
@@ -12,6 +12,34 @@ export default function ClientDashboard() {
   const [myRequests, setMyRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Chat State
+  const [chatOpen, setChatOpen] = useState(false);
+  const [messages, setMessages] = useState<{role: string, content: string}[]>([
+    {role: 'ai', content: '¡Hola! Soy Huellitas AI, tu asistente experto en adopciones. Cuéntame, ¿qué tipo de perrito estás buscando o cómo es tu estilo de vida?'}
+  ]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  const sendMessage = async () => {
+    if(!inputMessage.trim()) return;
+    const userMsg = inputMessage.trim();
+    setMessages(prev => [...prev, {role: 'user', content: userMsg}]);
+    setInputMessage('');
+    setIsTyping(true);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMsg })
+      });
+      const data = await response.json();
+      setMessages(prev => [...prev, {role: 'ai', content: data.reply}]);
+    } catch (err) {
+      setMessages(prev => [...prev, {role: 'ai', content: 'Ups, tuve un problema conectándome con mi cerebro (Backend). Asegúrate de que el servidor esté corriendo.'}]);
+    }
+    setIsTyping(false);
+  };
   useEffect(() => {
     async function loadClientData() {
       const { data: { session } } = await supabase.auth.getSession();
@@ -98,20 +126,44 @@ export default function ClientDashboard() {
         <h1 style={{fontSize: '1.75rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem'}}>¡Hola, {userName}! 👋</h1>
         <p style={{color: '#64748b', marginBottom: '2.5rem'}}>Este es el centro de control de tu proceso de adopción.</p>
 
-        {/* --- AI MATCH BANNER --- */}
-        <div style={{background: 'linear-gradient(135deg, #fff5f0 0%, #fff 100%)', border: '1px solid #ffedd5', borderRadius: '16px', padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem'}}>
-          <div>
-            <h3 style={{fontSize: '1.25rem', color: '#ea580c', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px'}}>
-              <Sparkles size={20} /> Encuentra tu match perfecto
-            </h3>
-            <p style={{color: '#78716c', marginTop: '4px', maxWidth: '600px'}}>
-              Nuestra Inteligencia Artificial está lista para analizar tu estilo de vida y recomendarte a los perritos que mejor se adapten a tu hogar y energía.
-            </p>
+        {/* --- AI MATCH BANNER / CHAT --- */}
+        {!chatOpen ? (
+          <div style={{background: 'linear-gradient(135deg, #fff5f0 0%, #fff 100%)', border: '1px solid #ffedd5', borderRadius: '16px', padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem'}}>
+            <div>
+              <h3 style={{fontSize: '1.25rem', color: '#ea580c', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px'}}>
+                <Sparkles size={20} /> Encuentra tu match perfecto
+              </h3>
+              <p style={{color: '#78716c', marginTop: '4px', maxWidth: '600px'}}>
+                Nuestra Inteligencia Artificial está lista para analizar tu estilo de vida y recomendarte a los perritos que mejor se adapten a tu hogar y energía.
+              </p>
+            </div>
+            <button onClick={() => setChatOpen(true)} style={{backgroundColor: 'var(--primary-orange)', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(234, 88, 12, 0.2)'}}>
+              Hablar con Huellitas AI
+            </button>
           </div>
-          <button style={{backgroundColor: 'var(--primary-orange)', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(234, 88, 12, 0.2)'}}>
-            Iniciar Cuestionario IA
-          </button>
-        </div>
+        ) : (
+          <div style={{backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '16px', display: 'flex', flexDirection: 'column', height: '400px', marginBottom: '2.5rem', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.05)'}}>
+            <div style={{backgroundColor: 'var(--primary-orange)', padding: '1rem', color: 'white', fontWeight: 700, display: 'flex', justifyContent: 'space-between'}}>
+              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Bot size={20}/> Huellitas AI (Motor LLaMA 3)</div>
+              <button onClick={() => setChatOpen(false)} style={{background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 700}}>X Cerrar</button>
+            </div>
+            <div style={{flexGrow: 1, padding: '1.5rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+              {messages.map((msg, i) => (
+                <div key={i} style={{alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '80%', display: 'flex', gap: '12px'}}>
+                  {msg.role === 'ai' && <div style={{width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--primary-orange-light)', color: 'var(--primary-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}><Bot size={18}/></div>}
+                  <div style={{backgroundColor: msg.role === 'user' ? 'var(--primary-orange)' : '#f1f5f9', color: msg.role === 'user' ? 'white' : '#334155', padding: '0.75rem 1rem', borderRadius: '12px', fontSize: '0.95rem', borderTopLeftRadius: msg.role === 'ai' ? 0 : 12, borderTopRightRadius: msg.role === 'user' ? 0 : 12, lineHeight: 1.5, whiteSpace: 'pre-wrap'}}>
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+              {isTyping && <div style={{fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic', marginLeft: '44px'}}>Huellitas AI está escribiendo...</div>}
+            </div>
+            <div style={{padding: '1rem', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '12px', backgroundColor: '#f8fafc'}}>
+              <input type="text" value={inputMessage} onChange={e => setInputMessage(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMessage()} placeholder="Escribe tu mensaje aquí..." style={{flexGrow: 1, padding: '0.75rem 1rem', borderRadius: '24px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.95rem'}} />
+              <button onClick={sendMessage} disabled={isTyping} style={{backgroundColor: 'var(--primary-orange)', border: 'none', color: 'white', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', opacity: isTyping ? 0.7 : 1}}><Send size={18}/></button>
+            </div>
+          </div>
+        )}
 
         <div style={{display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem'}}>
           
