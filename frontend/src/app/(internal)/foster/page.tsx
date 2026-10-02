@@ -9,6 +9,12 @@ export default function FosterPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', phone: '', address: '', capacity: 1, notes: '' });
 
+  // Asignación de perros
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [selectedFosterId, setSelectedFosterId] = useState<string | null>(null);
+  const [availableDogs, setAvailableDogs] = useState<any[]>([]);
+  const [selectedDogId, setSelectedDogId] = useState<string>('');
+
   const fetchFosters = async () => {
     // Al usar supabase, podemos traernos automáticamente a los perros asociados gracias a la foreign key que creé
     const { data } = await supabase.from('foster_homes').select('*, dogs(id, name)');
@@ -16,6 +22,29 @@ export default function FosterPage() {
   };
 
   useEffect(() => { fetchFosters(); }, []);
+
+  const openAssignModal = async (fosterId: string) => {
+    setSelectedFosterId(fosterId);
+    const { data } = await supabase.from('dogs').select('id, name').is('foster_home_id', null);
+    setAvailableDogs(data || []);
+    if (data && data.length > 0) setSelectedDogId(data[0].id);
+    setIsAssignModalOpen(true);
+  };
+
+  const handleAssignDog = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedDogId || !selectedFosterId) return;
+    await supabase.from('dogs').update({ foster_home_id: selectedFosterId }).eq('id', selectedDogId);
+    setIsAssignModalOpen(false);
+    fetchFosters();
+  };
+
+  const handleRemoveDog = async (dogId: string) => {
+    if (confirm("¿Seguro que quieres quitar a este perro de la casa puente?")) {
+      await supabase.from('dogs').update({ foster_home_id: null }).eq('id', dogId);
+      fetchFosters();
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,12 +85,18 @@ export default function FosterPage() {
             )}
 
             <div className={styles.dogsList}>
-              <div style={{fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px'}}>Huéspedes actuales:</div>
+              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: '8px'}}>
+                <div style={{fontSize: '0.85rem', fontWeight: 600}}>Huéspedes actuales:</div>
+                <button onClick={() => openAssignModal(foster.id)} style={{background:'none', border:'none', color:'var(--primary-orange)', cursor:'pointer', fontSize:'0.75rem', fontWeight:700, display:'flex', alignItems:'center', gap:'2px'}}>
+                  <Plus size={14}/> Asignar
+                </button>
+              </div>
               {foster.dogs && foster.dogs.length > 0 ? (
                 <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
                   {foster.dogs.map((dog:any) => (
-                    <span key={dog.id} style={{background: 'var(--primary-orange-light)', color: 'var(--primary-orange)', padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600}}>
+                    <span key={dog.id} style={{background: 'var(--primary-orange-light)', color: 'var(--primary-orange)', padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600, display:'flex', alignItems:'center', gap:'6px'}}>
                       🐶 {dog.name}
+                      <button onClick={() => handleRemoveDog(dog.id)} style={{background:'none', border:'none', color:'inherit', cursor:'pointer', padding:0, display:'flex'}} title="Quitar de esta casa"><X size={12}/></button>
                     </span>
                   ))}
                 </div>
@@ -101,6 +136,32 @@ export default function FosterPage() {
                 Guardar Casa
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {isAssignModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1.5rem'}}>
+              <h2 style={{fontWeight: 700}}>Asignar Perro al Voluntario</h2>
+              <button onClick={() => setIsAssignModalOpen(false)} style={{background:'none', border:'none', cursor:'pointer', color:'#666'}}><X/></button>
+            </div>
+            {availableDogs.length === 0 ? (
+              <p style={{color:'var(--text-muted)'}}>No hay perros disponibles (sin casa puente) en este momento en el catálogo.</p>
+            ) : (
+              <form onSubmit={handleAssignDog} style={{display:'flex', flexDirection:'column', gap:'1rem'}}>
+                <label style={{fontSize:'0.85rem', color:'var(--text-muted)'}}>Selecciona un perro del catálogo:</label>
+                <select value={selectedDogId} onChange={(e) => setSelectedDogId(e.target.value)} style={{padding:'0.75rem', borderRadius:'8px', border:'1px solid var(--border-color)', width:'100%'}}>
+                  {availableDogs.map(dog => (
+                    <option key={dog.id} value={dog.id}>{dog.name}</option>
+                  ))}
+                </select>
+                <button type="submit" style={{background:'var(--primary-orange)', color:'white', border:'none', padding:'1rem', borderRadius:'8px', fontWeight:700, cursor:'pointer', marginTop: '0.5rem'}}>
+                  Asignar Perro
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}
