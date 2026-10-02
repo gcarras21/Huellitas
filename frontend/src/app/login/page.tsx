@@ -12,7 +12,8 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    fullName: ''
+    fullName: '',
+    invitationCode: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -48,11 +49,23 @@ export default function LoginPage() {
       if (error) {
         setError(error.message);
       } else if (data.user) {
-        // Create profile as 'client'
+        let assignedRole = 'client';
+        
+        if (formData.invitationCode) {
+          const { data: codeData } = await supabase.from('invitation_codes').select('role').eq('code', formData.invitationCode).single();
+          if (codeData) {
+            assignedRole = codeData.role;
+          } else {
+            // Se ignora si es inválido
+            console.warn("Código inválido, asignando rol de cliente");
+          }
+        }
+
+        // Create profile
         await supabase.from('profiles').upsert({
           id: data.user.id,
           full_name: formData.fullName,
-          role: 'client'
+          role: assignedRole
         });
         alert('Cuenta creada exitosamente. Por favor inicia sesión.');
         setIsLogin(true);
@@ -84,10 +97,16 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit}>
             {!isLogin && (
-              <div className={styles.formGroup}>
-                <label>Nombre Completo</label>
-                <input type="text" name="fullName" required value={formData.fullName} onChange={handleInputChange} placeholder="Ej. Juan Pérez" />
-              </div>
+              <>
+                <div className={styles.formGroup}>
+                  <label>Nombre Completo</label>
+                  <input type="text" name="fullName" required value={formData.fullName} onChange={handleInputChange} placeholder="Ej. Juan Pérez" />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Código de Invitación (Opcional - Solo Staff)</label>
+                  <input type="text" name="invitationCode" value={formData.invitationCode} onChange={handleInputChange} placeholder="Ej. HUELLITAS-2026" />
+                </div>
+              </>
             )}
             
             <div className={styles.formGroup}>

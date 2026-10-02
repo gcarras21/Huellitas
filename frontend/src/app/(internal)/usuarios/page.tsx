@@ -2,21 +2,43 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
-import { Users, Plus, UserCircle, Shield, Mail, Edit2, X, Info } from 'lucide-react';
+import { Users, Plus, UserCircle, Shield, Mail, Edit2, X, Info, Search, Filter, Key } from 'lucide-react';
 import styles from './usuarios.module.css';
 
 export default function UsuariosPage() {
   const [profiles, setProfiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
+  // Auth state
+  const [currentUserRole, setCurrentUserRole] = useState<string>('client');
+  const [currentUserId, setCurrentUserId] = useState<string>('');
+
+  // Modals
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [newRole, setNewRole] = useState('client');
 
+  // Filters & Search
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('todos');
+
+  // Codes
+  const [generatedCode, setGeneratedCode] = useState('');
+  const [codeRole, setCodeRole] = useState('staff');
+
   const fetchProfiles = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+    
+    // Get current user role
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      setCurrentUserId(session.user.id);
+      const { data: prof } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
+      if (prof) setCurrentUserRole(prof.role || 'client');
+    }
+
+    const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
     if (data) setProfiles(data);
     setLoading(false);
   };
@@ -25,7 +47,18 @@ export default function UsuariosPage() {
     fetchProfiles();
   }, []);
 
+  const filteredProfiles = profiles.filter(p => {
+    const matchesSearch = (p.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()) || p.id.includes(searchTerm);
+    const role = p.role || 'client';
+    const matchesRole = roleFilter === 'todos' || role === roleFilter;
+    return matchesSearch && matchesRole;
+  });
+
   const openEditModal = (user: any) => {
+    if (currentUserRole !== 'admin' && user.role === 'admin') {
+      alert("No tienes permisos para editar a un Administrador.");
+      return;
+    }
     setSelectedUser(user);
     setNewRole(user.role || 'client');
     setIsEditModalOpen(true);
@@ -34,10 +67,24 @@ export default function UsuariosPage() {
   const handleUpdateRole = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUser) return;
+    if (currentUserRole !== 'admin' && newRole === 'admin') {
+      alert("Solo un Administrador puede crear otro Administrador.");
+      return;
+    }
     
     await supabase.from('profiles').update({ role: newRole }).eq('id', selectedUser.id);
     setIsEditModalOpen(false);
     fetchProfiles();
+  };
+
+  const handleGenerateCode = async () => {
+    if (currentUserRole !== 'admin' && codeRole === 'admin') {
+      alert("No puedes generar códigos de Administrador.");
+      return;
+    }
+    const code = `HUELLITAS-${codeRole.toUpperCase()}-${Math.random().toString(36).substring(2,8).toUpperCase()}`;
+    await supabase.from('invitation_codes').insert([{ code, role: codeRole }]);
+    setGeneratedCode(code);
   };
 
   const getRoleBadge = (role: string) => {
@@ -55,9 +102,45 @@ export default function UsuariosPage() {
           <h1 className="page-title">Gestión de Equipo y Usuarios</h1>
           <p className="page-subtitle">Administra los accesos y roles del equipo de la fundación y clientes.</p>
         </div>
-        <button className={styles.btnPrimary} style={{width:'auto'}} onClick={() => setIsInviteModalOpen(true)}>
-          <Plus size={20} /> Nuevo Miembro
+        <button className={styles.btnPrimary} style={{width:'auto'}} onClick={() => { setIsInviteModalOpen(true); setGeneratedCode(''); }}>
+          <Key size={20} /> Generar Código
         </button>
+      </div>
+
+      <div style={{display: 'flex', gap: '1rem', marginBottom: '1.5rem', alignItems: 'center'}}>
+        <div style={{display: 'flex', alignItems: 'center', background: 'white', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.5rem 1rem', flex: 1, maxWidth: '400px'}}>
+          <Search size={18} color="var(--text-muted)" style={{marginRight: '8px'}} />
+          <input 
+            type="text" 
+            placeholder="Buscar por nombre o ID..." 
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            style={{border: 'none', outline: 'none', width: '100%', fontSize: '0.9rem'}}
+          />
+        </div>
+        
+        <div style={{display: 'flex', gap: '8px'}}>
+          {['todos', 'admin', 'supervisor', 'staff', 'client'].map(tab => (
+            <button 
+              key={tab}
+              onClick={() => setRoleFilter(tab)}
+              style={{
+                padding: '0.5rem 1rem', 
+                borderRadius: '20px', 
+                border: '1px solid',
+                borderColor: roleFilter === tab ? 'var(--primary-orange)' : 'var(--border-color)',
+                backgroundColor: roleFilter === tab ? 'var(--primary-orange-light)' : 'white',
+                color: roleFilter === tab ? 'var(--primary-orange)' : 'var(--text-muted)',
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                textTransform: 'capitalize'
+              }}
+            >
+              {tab === 'client' ? 'Clientes' : tab}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div style={{backgroundColor: 'var(--panel-bg)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden'}}>
@@ -70,17 +153,22 @@ export default function UsuariosPage() {
         
         {loading ? (
           <div style={{padding: '3rem', textAlign: 'center', color: 'var(--text-muted)'}}>Cargando directorio...</div>
+        ) : filteredProfiles.length === 0 ? (
+           <div style={{padding: '3rem', textAlign: 'center', color: 'var(--text-muted)'}}>No se encontraron usuarios con esos filtros.</div>
         ) : (
-          profiles.map(profile => {
+          filteredProfiles.map(profile => {
             const badge = getRoleBadge(profile.role);
+            const isMe = profile.id === currentUserId;
             return (
-              <div key={profile.id} style={{display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 100px', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', alignItems: 'center'}}>
+              <div key={profile.id} style={{display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 100px', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', alignItems: 'center', backgroundColor: isMe ? '#fffaf5' : 'transparent'}}>
                 <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
                   <div style={{width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary-orange-light)', color: 'var(--primary-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                     <UserCircle size={24} />
                   </div>
                   <div>
-                    <div style={{fontWeight: 700, color: 'var(--text-dark)'}}>{profile.full_name || 'Usuario sin nombre'}</div>
+                    <div style={{fontWeight: 700, color: 'var(--text-dark)'}}>
+                      {profile.full_name || 'Usuario sin nombre'} {isMe && <span style={{fontSize:'0.75rem', color:'var(--primary-orange)', fontWeight:600}}>(Tú)</span>}
+                    </div>
                     <div style={{fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px'}}>
                       <Mail size={12}/> ID: {profile.id.substring(0,8)}
                     </div>
@@ -133,7 +221,7 @@ export default function UsuariosPage() {
                   <option value="client">Cliente / Adoptante</option>
                   <option value="staff">Staff (Operativo)</option>
                   <option value="supervisor">Supervisor</option>
-                  <option value="admin">Administrador Total</option>
+                  {currentUserRole === 'admin' && <option value="admin">Administrador Total</option>}
                 </select>
               </div>
               <button type="submit" className={styles.btnPrimary}>
@@ -144,32 +232,41 @@ export default function UsuariosPage() {
         </div>
       )}
 
-      {/* Modal de Invitación (Explicativo) */}
+      {/* Modal de Invitación */}
       {isInviteModalOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1.5rem'}}>
-              <h2 style={{fontWeight: 700}}>Invitar al Equipo</h2>
+              <h2 style={{fontWeight: 700}}>Generar Código de Invitación</h2>
               <button onClick={() => setIsInviteModalOpen(false)} style={{background:'none', border:'none', cursor:'pointer', color:'#666'}}><X/></button>
             </div>
             
-            <div style={{background: '#fff7ed', border: '1px solid #fdba74', padding: '1rem', borderRadius: '8px', color: '#c2410c', display: 'flex', gap: '12px', marginBottom: '1.5rem'}}>
-              <Info size={24} style={{flexShrink: 0, marginTop: '2px'}}/>
-              <div style={{fontSize: '0.9rem', lineHeight: '1.5'}}>
-                Para proteger la seguridad de la plataforma, el sistema no permite crear contraseñas para otras personas.
-              </div>
-            </div>
-
-            <p style={{fontSize: '0.95rem', color: 'var(--text-dark)', marginBottom: '1.5rem', lineHeight: '1.6'}}>
-              <strong>Instrucciones:</strong><br/>
-              1. Pide a tu colega que entre al <b>Portal Público</b> y se registre usando el botón de Iniciar Sesión.<br/>
-              2. Una vez que cree su cuenta, aparecerá aquí en este directorio.<br/>
-              3. Dale clic al botón de <b>Editar</b> junto a su nombre y cámbiale el rol a <b>Staff</b>, <b>Supervisor</b> o <b>Admin</b>.
+            <p style={{fontSize: '0.9rem', color: 'var(--text-dark)', marginBottom: '1.5rem', lineHeight: '1.5'}}>
+              Genera un código secreto para pasárselo a tu nuevo colega. Cuando se registren en la plataforma y pongan este código, el sistema les dará el rol automáticamente.
             </p>
 
-            <button onClick={() => setIsInviteModalOpen(false)} className={styles.btnPrimary}>
-              Entendido
-            </button>
+            <div style={{display:'flex', flexDirection:'column', gap:'1rem', marginBottom:'1.5rem'}}>
+              <div>
+                <label style={{fontSize:'0.85rem', color:'var(--text-muted)', display:'block', marginBottom:'4px'}}>Rol a otorgar:</label>
+                <select value={codeRole} onChange={e => setCodeRole(e.target.value)} style={{padding:'0.75rem', borderRadius:'8px', border:'1px solid var(--border-color)', width:'100%', fontFamily:'inherit'}}>
+                  <option value="staff">Staff (Operativo)</option>
+                  <option value="supervisor">Supervisor</option>
+                  {currentUserRole === 'admin' && <option value="admin">Administrador Total</option>}
+                </select>
+              </div>
+              
+              <button onClick={handleGenerateCode} className={styles.btnSecondary} style={{width:'100%', padding:'0.75rem', border:'1px solid var(--border-color)'}}>
+                Generar Código
+              </button>
+            </div>
+
+            {generatedCode && (
+              <div style={{background: '#f6ffed', border: '1px solid #b7eb8f', padding: '1rem', borderRadius: '8px', textAlign: 'center'}}>
+                <div style={{fontSize: '0.8rem', color: '#52c41a', fontWeight: 600, marginBottom: '4px'}}>CÓDIGO GENERADO ÉXITOSAMENTE</div>
+                <div style={{fontSize: '1.5rem', fontWeight: 800, color: '#389e0d', letterSpacing: '2px'}}>{generatedCode}</div>
+                <div style={{fontSize: '0.75rem', color: '#52c41a', marginTop: '8px'}}>Cópialo y envíaselo por WhatsApp.</div>
+              </div>
+            )}
           </div>
         </div>
       )}
