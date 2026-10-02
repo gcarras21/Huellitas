@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
-import { HeartPulse, Syringe, Pill, Stethoscope, Plus, X, Calendar, User } from 'lucide-react';
+import { HeartPulse, Syringe, Pill, Stethoscope, Plus, X, Calendar, User, Trash2 } from 'lucide-react';
 import styles from './health.module.css';
 
 export default function HealthPage() {
@@ -57,6 +57,12 @@ export default function HealthPage() {
     setIsModalOpen(false);
     setFormData({ record_type: 'vaccine', description: '', date_administered: '', next_due_date: '', vet_name: '' });
     selectDog(selectedDog);
+  };
+
+  const handleDelete = async (recordId: string) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar este registro médico?')) return;
+    await supabase.from('medical_records').delete().eq('id', recordId);
+    if (selectedDog) selectDog(selectedDog);
   };
 
   const getIcon = (type: string) => {
@@ -127,7 +133,7 @@ export default function HealthPage() {
                       <div className={`${styles.recordIcon} ${styles[record.record_type]}`}>
                         {getIcon(record.record_type)}
                       </div>
-                      <div className={styles.recordDetails}>
+                      <div className={styles.recordDetails} style={{flexGrow: 1}}>
                         <div className={styles.recordTitle}>{record.description}</div>
                         <div className={styles.recordDate}>
                           <span style={{display:'flex', alignItems:'center', gap:'4px'}}><Calendar size={14}/> Aplicado: {record.date_administered || 'Sin fecha'}</span>
@@ -141,6 +147,15 @@ export default function HealthPage() {
                           </div>
                         )}
                       </div>
+                      <button 
+                        onClick={() => handleDelete(record.id)}
+                        style={{background:'transparent', border:'none', cursor:'pointer', color:'#ef4444', padding: '8px', alignSelf: 'flex-start', opacity: 0.7}}
+                        onMouseOver={(e) => e.currentTarget.style.opacity = '1'}
+                        onMouseOut={(e) => e.currentTarget.style.opacity = '0.7'}
+                        title="Eliminar registro"
+                      >
+                        <Trash2 size={18} />
+                      </button>
                     </div>
                   ))
                 )}
