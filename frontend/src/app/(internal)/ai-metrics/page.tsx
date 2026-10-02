@@ -1,15 +1,33 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles, BrainCircuit, Activity, Zap, Server, ShieldCheck, Cpu } from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
 
 export default function AiMetricsDashboard() {
+  const [totalTokens, setTotalTokens] = useState(0);
+  
+  useEffect(() => {
+    supabase.from('ai_usage').select('total_tokens').then(({data}) => {
+      if (data) {
+        const sum = data.reduce((acc, curr) => acc + curr.total_tokens, 0);
+        setTotalTokens(sum);
+      }
+    });
+  }, []);
+
+  const MAX_LIMIT = 100000;
+  const percentage = Math.min(100, Math.round((totalTokens / MAX_LIMIT) * 100));
+  const remaining = Math.max(0, MAX_LIMIT - totalTokens);
+  
+  const gpt4Cost = (totalTokens / 1000) * 0.03;
+
   return (
     <>
       <div className="dashboard-header">
         <div>
           <h2>Inteligencia Artificial</h2>
-          <p>Métricas en tiempo real del motor LLaMA 3.1 8B Instant</p>
+          <p>Métricas en tiempo real del motor Qwen 3.8 (27B)</p>
         </div>
       </div>
 
@@ -19,16 +37,16 @@ export default function AiMetricsDashboard() {
           <div className="bento-title"><BrainCircuit size={18}/> Arquitectura del Modelo</div>
           <div style={{display: 'flex', gap: '2rem', marginTop: '1rem'}}>
             <div style={{flex: 1, backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
-              <h3 style={{fontSize: '1.5rem', fontWeight: 800, color: '#0f172a'}}>LLaMA 3.1 (8B)</h3>
-              <p style={{color: '#64748b', fontSize: '0.85rem', marginTop: '4px'}}>Meta Open Source Foundation</p>
+              <h3 style={{fontSize: '1.5rem', fontWeight: 800, color: '#0f172a'}}>Qwen 3.8 (27B)</h3>
+              <p style={{color: '#64748b', fontSize: '0.85rem', marginTop: '4px'}}>Alibaba Cloud Foundation</p>
               <div style={{marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '12px'}}>
                 <div style={{display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px'}}>
                   <span style={{color: '#475569', fontSize: '0.85rem'}}>Parámetros</span>
-                  <span style={{fontWeight: 700, color: '#0f172a'}}>8 Billones</span>
+                  <span style={{fontWeight: 700, color: '#0f172a'}}>27 Billones</span>
                 </div>
                 <div style={{display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px'}}>
                   <span style={{color: '#475569', fontSize: '0.85rem'}}>Ventana de Contexto</span>
-                  <span style={{fontWeight: 700, color: '#0f172a'}}>131,072 Tokens</span>
+                  <span style={{fontWeight: 700, color: '#0f172a'}}>32,768 Tokens</span>
                 </div>
                 <div style={{display: 'flex', justifyContent: 'space-between'}}>
                   <span style={{color: '#475569', fontSize: '0.85rem'}}>Arquitectura</span>
@@ -71,10 +89,10 @@ export default function AiMetricsDashboard() {
             <div style={{position: 'relative', width: '150px', height: '150px', margin: '0 auto'}}>
               <svg viewBox="0 0 36 36" style={{width: '100%', height: '100%', transform: 'rotate(-90deg)'}}>
                 <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e2e8f0" strokeWidth="3"/>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--primary-orange)" strokeWidth="3" strokeDasharray="15, 100" />
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--primary-orange)" strokeWidth="3" strokeDasharray={`${percentage}, 100`} />
               </svg>
               <div style={{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center'}}>
-                <div style={{fontSize: '1.5rem', fontWeight: 800, color: '#0f172a'}}>15%</div>
+                <div style={{fontSize: '1.5rem', fontWeight: 800, color: '#0f172a'}}>{percentage}%</div>
                 <div style={{fontSize: '0.65rem', color: '#64748b'}}>USO DIARIO</div>
               </div>
             </div>
@@ -83,11 +101,11 @@ export default function AiMetricsDashboard() {
           <div style={{marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem'}}>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
               <span style={{color: '#64748b', fontSize: '0.85rem'}}>Tokens Usados</span>
-              <span style={{fontWeight: 700, color: '#0f172a'}}>15,420</span>
+              <span style={{fontWeight: 700, color: '#0f172a'}}>{totalTokens.toLocaleString()}</span>
             </div>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
               <span style={{color: '#64748b', fontSize: '0.85rem'}}>Límite Restante</span>
-              <span style={{fontWeight: 700, color: '#10b981'}}>84,580</span>
+              <span style={{fontWeight: 700, color: '#10b981'}}>{remaining.toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -106,14 +124,14 @@ export default function AiMetricsDashboard() {
             <div className="stat-box" style={{backgroundColor: '#fff', border: '1px solid #e2e8f0'}}>
               <div className="icon-box" style={{backgroundColor: '#fee2e2', color: '#ef4444'}}><Cpu size={16}/></div>
               <div>
-                <h3 style={{color: '#0f172a'}}>$0.46 <span style={{fontSize: '0.8rem'}}>USD</span></h3>
+                <h3 style={{color: '#0f172a'}}>${gpt4Cost.toFixed(2)} <span style={{fontSize: '0.8rem'}}>USD</span></h3>
                 <p style={{color: '#64748b'}}>Costo Equivalente GPT-4</p>
               </div>
             </div>
             <div className="stat-box" style={{backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0'}}>
               <div className="icon-box green" style={{backgroundColor: '#16a34a', color: 'white'}}><Sparkles size={16}/></div>
               <div>
-                <h3 style={{color: '#166534'}}>$0.46 <span style={{fontSize: '0.8rem'}}>USD</span></h3>
+                <h3 style={{color: '#166534'}}>${gpt4Cost.toFixed(2)} <span style={{fontSize: '0.8rem'}}>USD</span></h3>
                 <p style={{color: '#15803d'}}>Ahorro Neto Diario</p>
               </div>
             </div>

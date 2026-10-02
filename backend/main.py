@@ -63,7 +63,20 @@ async def chat_with_ai(request: ChatRequest):
             temperature=0.7,
             max_tokens=500,
         )
-        return {"reply": completion.choices[0].message.content}
+        reply_content = completion.choices[0].message.content
+        
+        # Guardar uso de tokens en base de datos
+        try:
+            if hasattr(completion, 'usage') and completion.usage:
+                supabase.table("ai_usage").insert({
+                    "prompt_tokens": completion.usage.prompt_tokens,
+                    "completion_tokens": completion.usage.completion_tokens,
+                    "total_tokens": completion.usage.total_tokens
+                }).execute()
+        except Exception as metric_err:
+            print("Error guardando metricas:", metric_err)
+            
+        return {"reply": reply_content}
     except Exception as e:
         return {"reply": f"Lo siento, hubo un error procesando tu solicitud: {str(e)}"}
 
