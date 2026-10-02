@@ -61,9 +61,14 @@ export default function InternalLayout({ children }: { children: React.ReactNode
         </nav>
         
         <div style={{marginTop: '2rem'}}>
-          <Link href="/" className="nav-item" style={{color: 'var(--primary-orange)', fontWeight: 600}}>
-            <Globe size={18}/> Ver Portal Público
+          <div style={{fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.5rem', padding: '0 1rem'}}>Cambiar de Portal</div>
+          <Link href="/" className="nav-item" style={{color: '#10b981', fontWeight: 600}}>
+            <Globe size={18}/> Portal Público
           </Link>
+          <Link href="/mi-cuenta" className="nav-item" style={{color: 'var(--primary-orange)', fontWeight: 600}}>
+            <Users size={18}/> Portal de Adoptante
+          </Link>
+        </div>
           <div className="nav-item"><Settings size={18}/> Settings</div>
           <div className="nav-item"><HelpCircle size={18}/> Need help?</div>
         </div>
