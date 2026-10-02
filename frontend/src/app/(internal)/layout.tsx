@@ -32,7 +32,6 @@ export default function InternalLayout({ children }: { children: React.ReactNode
     { name: 'Health & Medical', icon: HeartPulse, href: '/health' },
     { name: 'Events', icon: Calendar, href: '/events' },
     { name: 'Reports', icon: BarChart2, href: '/reports' },
-    { name: 'Documents', icon: FileText, href: '/documents' },
     { name: 'Staff', icon: Users, href: '/usuarios' },
   ];
 
