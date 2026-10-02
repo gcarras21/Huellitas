@@ -1,16 +1,17 @@
 .kanbanContainer {
   display: flex;
-  gap: 1.5rem;
-  overflow-x: auto;
-  padding-bottom: 1rem;
-  height: calc(100vh - 200px);
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+  height: calc(100vh - 180px);
   align-items: flex-start;
+  width: 100%;
 }
 
 .column {
-  flex: 0 0 300px;
+  flex: 1 1 0;
+  min-width: 0;
   background-color: var(--panel-bg);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--border-radius-md);
   border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
