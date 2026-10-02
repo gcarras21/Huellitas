@@ -101,7 +101,7 @@ export default function DashboardPage() {
               upcomingMeds.map((med) => (
                 <div key={med.id} className="dog-card-mini">
                   {med.dogs?.photo_url ? (
-                    <img src={med.dogs.photo_url} alt={med.dogs?.name} style={{width: '100%', height: 100, borderRadius: 8, objectFit: 'cover'}} />
+                    <img src={med.dogs.photo_url} alt={med.dogs?.name} style={{width: '100%', height: 100, borderRadius: 8, objectFit: 'contain', backgroundColor: '#f8fafc'}} />
                   ) : (
                     <div style={{backgroundColor: '#e2e8f0', height: 100, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8'}}>
                       <Dog size={32}/>
@@ -161,7 +161,7 @@ export default function DashboardPage() {
             <div className="list-item" key={app.id}>
               <div className="list-item-left">
                 {app.dogs?.photo_url ? (
-                  <img src={app.dogs.photo_url} style={{width: 40, height: 40, borderRadius: '50%', objectFit: 'cover'}} />
+                  <img src={app.dogs.photo_url} style={{width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center top'}} />
                 ) : (
                   <div style={{width: 40, height: 40, borderRadius: '50%', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Dog size={16} color="#aaa"/></div>
                 )}
