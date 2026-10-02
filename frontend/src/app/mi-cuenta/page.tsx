@@ -16,6 +16,9 @@ export default function ClientDashboard() {
   // View State
   const [chatOpen, setChatOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [fullNameInput, setFullNameInput] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   
   const [messages, setMessages] = useState<{role: string, content: string}[]>([
     {role: 'ai', content: '¡Hola! Soy Huellitas AI, tu asistente experto en adopciones. Cuéntame, ¿qué tipo de perrito estás buscando o cómo es tu estilo de vida?'}
@@ -49,7 +52,11 @@ export default function ClientDashboard() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-        if (profile) setUserName(profile.full_name?.split(' ')[0] || 'Adoptante');
+        if (profile) {
+          setUserName(profile.full_name?.split(' ')[0] || 'Adoptante');
+          setFullNameInput(profile.full_name || '');
+        }
+        setUserEmail(session.user.email || '');
 
         // Fetch their adoption requests
         const { data: reqs } = await supabase.from('adoption_requests')
@@ -75,6 +82,14 @@ export default function ClientDashboard() {
     return 1;
   };
 
+  const updateProfile = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    await supabase.from('profiles').update({ full_name: fullNameInput }).eq('id', session.user.id);
+    setUserName(fullNameInput.split(' ')[0]);
+    alert('Perfil actualizado con éxito');
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/login');
@@ -94,16 +109,16 @@ export default function ClientDashboard() {
         </div>
 
         <nav style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', flexGrow: 1}}>
-          <div onClick={() => {setChatOpen(false); setCatalogOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: (!chatOpen && !catalogOpen) ? 'var(--primary-orange-light)' : 'transparent', color: (!chatOpen && !catalogOpen) ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+          <div onClick={() => {setChatOpen(false); setCatalogOpen(false); setProfileOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: (!chatOpen && !catalogOpen && !profileOpen) ? 'var(--primary-orange-light)' : 'transparent', color: (!chatOpen && !catalogOpen && !profileOpen) ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Home size={18}/> Mi Inicio
           </div>
-          <div onClick={() => {setChatOpen(true); setCatalogOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: chatOpen ? 'var(--primary-orange-light)' : 'transparent', color: chatOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+          <div onClick={() => {setChatOpen(true); setCatalogOpen(false); setProfileOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: chatOpen ? 'var(--primary-orange-light)' : 'transparent', color: chatOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Bot size={18}/> Huellitas AI
           </div>
-          <div onClick={() => {setChatOpen(false); setCatalogOpen(true);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: catalogOpen ? 'var(--primary-orange-light)' : 'transparent', color: catalogOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+          <div onClick={() => {setChatOpen(false); setCatalogOpen(true); setProfileOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: catalogOpen ? 'var(--primary-orange-light)' : 'transparent', color: catalogOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Dog size={18}/> Catálogo de Perros
           </div>
-          <div style={{padding: '0.8rem 1rem', borderRadius: '8px', color: '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+          <div onClick={() => {setChatOpen(false); setCatalogOpen(false); setProfileOpen(true);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: profileOpen ? 'var(--primary-orange-light)' : 'transparent', color: profileOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Settings size={18}/> Mi Perfil
           </div>
         </nav>
@@ -138,7 +153,7 @@ export default function ClientDashboard() {
         <p style={{color: '#64748b', marginBottom: '2.5rem'}}>Este es el centro de control de tu proceso de adopción.</p>
 
         {/* --- AI MATCH BANNER --- */}
-        {!chatOpen && !catalogOpen && (
+        {!chatOpen && !catalogOpen && !profileOpen && (
           <div style={{background: 'linear-gradient(135deg, #fff5f0 0%, #fff 100%)', border: '1px solid #ffedd5', borderRadius: '16px', padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem'}}>
             <div>
               <h3 style={{fontSize: '1.25rem', color: '#ea580c', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px'}}>
@@ -221,7 +236,29 @@ export default function ClientDashboard() {
           </div>
         )}
 
-        {!chatOpen && !catalogOpen && (
+        {/* --- PROFILE VIEW --- */}
+        {profileOpen && (
+          <div style={{marginBottom: '2.5rem', maxWidth: '600px'}}>
+             <h2 style={{fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '1.5rem'}}>Configuración de Perfil</h2>
+             <div style={{backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.02)'}}>
+               <div style={{display: 'flex', flexDirection: 'column', gap: '1.5rem'}}>
+                 <div>
+                   <label style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem'}}>Nombre Completo</label>
+                   <input type="text" value={fullNameInput} onChange={e => setFullNameInput(e.target.value)} style={{width: '100%', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit', fontSize: '1rem', outline: 'none'}} />
+                 </div>
+                 <div>
+                   <label style={{display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem'}}>Correo Electrónico (No modificable)</label>
+                   <input type="email" value={userEmail} readOnly style={{width: '100%', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', color: '#94a3b8', fontFamily: 'inherit', fontSize: '1rem', cursor: 'not-allowed', outline: 'none'}} />
+                 </div>
+                 <button onClick={updateProfile} style={{backgroundColor: 'var(--primary-orange)', color: 'white', border: 'none', padding: '0.8rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', marginTop: '0.5rem'}}>
+                   Guardar Cambios
+                 </button>
+               </div>
+             </div>
+          </div>
+        )}
+
+        {!chatOpen && !catalogOpen && !profileOpen && (
           <div style={{display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem'}}>
           
           {/* --- TRACKER DE ADOPCIÓN --- */}
@@ -234,9 +271,7 @@ export default function ClientDashboard() {
               <div style={{border: '1px dashed #cbd5e1', borderRadius: '12px', padding: '3rem', textAlign: 'center', backgroundColor: '#fff'}}>
                 <Dog size={32} color="#94a3b8" style={{margin: '0 auto', marginBottom: '1rem'}} />
                 <p style={{color: '#64748b', marginBottom: '1rem'}}>Aún no tienes solicitudes de adopción activas.</p>
-                <Link href="/#adoptar" style={{textDecoration: 'none'}}>
-                  <button style={{backgroundColor: '#fff', border: '1px solid #cbd5e1', padding: '0.6rem 1.2rem', borderRadius: '6px', fontWeight: 600, color: '#475569', cursor: 'pointer', transition: 'all 0.2s'}}>Explorar Catálogo</button>
-                </Link>
+                <button onClick={() => {setChatOpen(false); setCatalogOpen(true); setProfileOpen(false);}} style={{backgroundColor: '#fff', border: '1px solid #cbd5e1', padding: '0.6rem 1.2rem', borderRadius: '6px', fontWeight: 600, color: '#475569', cursor: 'pointer', transition: 'all 0.2s'}}>Explorar Catálogo</button>
               </div>
             ) : (
               <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
