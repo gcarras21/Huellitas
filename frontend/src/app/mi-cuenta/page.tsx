@@ -13,8 +13,10 @@ export default function ClientDashboard() {
   const [allDogs, setAllDogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Chat State
+  // View State
   const [chatOpen, setChatOpen] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  
   const [messages, setMessages] = useState<{role: string, content: string}[]>([
     {role: 'ai', content: '¡Hola! Soy Huellitas AI, tu asistente experto en adopciones. Cuéntame, ¿qué tipo de perrito estás buscando o cómo es tu estilo de vida?'}
   ]);
@@ -92,17 +94,15 @@ export default function ClientDashboard() {
         </div>
 
         <nav style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', flexGrow: 1}}>
-          <div onClick={() => setChatOpen(false)} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: !chatOpen ? 'var(--primary-orange-light)' : 'transparent', color: !chatOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+          <div onClick={() => {setChatOpen(false); setCatalogOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: (!chatOpen && !catalogOpen) ? 'var(--primary-orange-light)' : 'transparent', color: (!chatOpen && !catalogOpen) ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Home size={18}/> Mi Inicio
           </div>
-          <div onClick={() => setChatOpen(true)} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: chatOpen ? 'var(--primary-orange-light)' : 'transparent', color: chatOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+          <div onClick={() => {setChatOpen(true); setCatalogOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: chatOpen ? 'var(--primary-orange-light)' : 'transparent', color: chatOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Bot size={18}/> Huellitas AI
           </div>
-          <Link href="/#adoptar" style={{textDecoration: 'none'}}>
-            <div style={{padding: '0.8rem 1rem', borderRadius: '8px', color: '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
-              <Dog size={18}/> Catálogo de Perros
-            </div>
-          </Link>
+          <div onClick={() => {setChatOpen(false); setCatalogOpen(true);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: catalogOpen ? 'var(--primary-orange-light)' : 'transparent', color: catalogOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+            <Dog size={18}/> Catálogo de Perros
+          </div>
           <div style={{padding: '0.8rem 1rem', borderRadius: '8px', color: '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Settings size={18}/> Mi Perfil
           </div>
@@ -137,8 +137,8 @@ export default function ClientDashboard() {
         <h1 style={{fontSize: '1.75rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem'}}>¡Hola, {userName}! 👋</h1>
         <p style={{color: '#64748b', marginBottom: '2.5rem'}}>Este es el centro de control de tu proceso de adopción.</p>
 
-        {/* --- AI MATCH BANNER / CHAT --- */}
-        {!chatOpen ? (
+        {/* --- AI MATCH BANNER --- */}
+        {!chatOpen && !catalogOpen && (
           <div style={{background: 'linear-gradient(135deg, #fff5f0 0%, #fff 100%)', border: '1px solid #ffedd5', borderRadius: '16px', padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem'}}>
             <div>
               <h3 style={{fontSize: '1.25rem', color: '#ea580c', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px'}}>
@@ -148,11 +148,14 @@ export default function ClientDashboard() {
                 Nuestra Inteligencia Artificial está lista para analizar tu estilo de vida y recomendarte a los perritos que mejor se adapten a tu hogar y energía.
               </p>
             </div>
-            <button onClick={() => setChatOpen(true)} style={{backgroundColor: 'var(--primary-orange)', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(234, 88, 12, 0.2)'}}>
+            <button onClick={() => {setChatOpen(true); setCatalogOpen(false);}} style={{backgroundColor: 'var(--primary-orange)', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(234, 88, 12, 0.2)'}}>
               Hablar con Huellitas AI
             </button>
           </div>
-        ) : (
+        )}
+        
+        {/* --- CHAT VIEW --- */}
+        {chatOpen && (
           <div style={{backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '16px', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 180px)', marginBottom: '2.5rem', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.05)'}}>
             <div style={{backgroundColor: 'var(--primary-orange)', padding: '1rem', color: 'white', fontWeight: 700, display: 'flex', justifyContent: 'space-between'}}>
               <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Bot size={20}/> Huellitas AI</div>
@@ -194,7 +197,31 @@ export default function ClientDashboard() {
           </div>
         )}
 
-        {!chatOpen && (
+        {/* --- CATALOG VIEW --- */}
+        {catalogOpen && (
+          <div style={{marginBottom: '2.5rem'}}>
+             <h2 style={{fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '1.5rem'}}>Catálogo de Perros en Adopción</h2>
+             <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.5rem'}}>
+               {allDogs.map(dog => (
+                 <div key={dog.id} style={{backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.02)'}}>
+                   <img src={dog.photo_url || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop"} alt={dog.name} style={{width: '100%', height: '180px', objectFit: 'cover'}} />
+                   <div style={{padding: '1rem'}}>
+                     <h3 style={{fontSize: '1.1rem', fontWeight: 700, margin: '0 0 0.5rem 0', color: '#1e293b'}}>{dog.name}</h3>
+                     <div style={{display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '0.75rem'}}>
+                       {dog.size && <span style={{fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', backgroundColor: '#f1f5f9', color: '#475569'}}>{dog.size}</span>}
+                       {dog.age_months !== null && <span style={{fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', backgroundColor: '#f1f5f9', color: '#475569'}}>{dog.age_months} meses</span>}
+                     </div>
+                     <p style={{fontSize: '0.8rem', color: '#64748b', margin: 0}}><strong>Raza:</strong> {dog.breed || 'Mestizo'}</p>
+                     <p style={{fontSize: '0.8rem', color: '#64748b', margin: '4px 0 0 0'}}><strong>Energía:</strong> {dog.energy_level || 'Normal'}</p>
+                     <p style={{fontSize: '0.8rem', color: '#64748b', margin: '4px 0 0 0'}}><strong>Salud:</strong> {dog.health_status || 'Sano'}</p>
+                   </div>
+                 </div>
+               ))}
+             </div>
+          </div>
+        )}
+
+        {!chatOpen && !catalogOpen && (
           <div style={{display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem'}}>
           
           {/* --- TRACKER DE ADOPCIÓN --- */}

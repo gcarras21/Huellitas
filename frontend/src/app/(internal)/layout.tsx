@@ -24,6 +24,7 @@ export default function InternalLayout({ children }: { children: React.ReactNode
     });
   }, []);
 
+  const navItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
     { name: 'Perros', icon: Dog, href: '/perros' },
     { name: 'Solicitudes', icon: ClipboardList, href: '/solicitudes' },
