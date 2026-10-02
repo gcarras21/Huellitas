@@ -32,8 +32,6 @@ body {
   font-family: 'Outfit', sans-serif;
   background-color: var(--bg-color);
   color: var(--text-dark);
-  height: 100vh;
-  overflow: hidden;
 }
 
 a {
