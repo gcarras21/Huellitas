@@ -10,6 +10,7 @@ export default function ClientDashboard() {
   const router = useRouter();
   const [userName, setUserName] = useState('Adoptante');
   const [myRequests, setMyRequests] = useState<any[]>([]);
+  const [allDogs, setAllDogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Chat State
@@ -54,6 +55,10 @@ export default function ClientDashboard() {
           .eq('user_id', session.user.id);
         
         if (reqs) setMyRequests(reqs);
+
+        // Fetch all dogs for AI visual matching
+        const { data: dogs } = await supabase.from('dogs').select('*');
+        if (dogs) setAllDogs(dogs);
       }
       setLoading(false);
     }
@@ -149,14 +154,32 @@ export default function ClientDashboard() {
               <button onClick={() => setChatOpen(false)} style={{background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 700}}>X Cerrar</button>
             </div>
             <div style={{flexGrow: 1, padding: '1.5rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem'}}>
-              {messages.map((msg, i) => (
+              {messages.map((msg, i) => {
+                const mentionedDogs = msg.role === 'ai' ? allDogs.filter(d => msg.content.toLowerCase().includes(d.name.toLowerCase())) : [];
+                return (
                 <div key={i} style={{alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '80%', display: 'flex', gap: '12px'}}>
                   {msg.role === 'ai' && <div style={{width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--primary-orange-light)', color: 'var(--primary-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}><Bot size={18}/></div>}
                   <div style={{backgroundColor: msg.role === 'user' ? 'var(--primary-orange)' : '#f1f5f9', color: msg.role === 'user' ? 'white' : '#334155', padding: '0.75rem 1rem', borderRadius: '12px', fontSize: '0.95rem', borderTopLeftRadius: msg.role === 'ai' ? 0 : 12, borderTopRightRadius: msg.role === 'user' ? 0 : 12, lineHeight: 1.5, whiteSpace: 'pre-wrap'}}>
                     {msg.content}
+                    
+                    {mentionedDogs.length > 0 && (
+                      <div style={{display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px'}}>
+                        {mentionedDogs.map(dog => (
+                          <div key={dog.id} style={{minWidth: '120px', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '8px', backgroundColor: '#fff', color: '#334155'}}>
+                            {dog.photo_url ? (
+                              <img src={dog.photo_url} style={{width: '100%', height: '70px', objectFit: 'cover', borderRadius: '4px', marginBottom: '8px'}} alt={dog.name} />
+                            ) : (
+                              <div style={{width: '100%', height: '70px', backgroundColor: '#e2e8f0', borderRadius: '4px', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Dog color="#94a3b8"/></div>
+                            )}
+                            <div style={{fontSize: '0.85rem', fontWeight: 700}}>{dog.name}</div>
+                            <div style={{fontSize: '0.7rem', color: '#64748b'}}>{dog.breed}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
-              ))}
+              )})}
               {isTyping && <div style={{fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic', marginLeft: '44px'}}>Huellitas AI está escribiendo...</div>}
             </div>
             <div style={{padding: '1rem', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '12px', backgroundColor: '#f8fafc'}}>
