@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { LayoutDashboard, Dog, ClipboardList, Home, HeartPulse, Calendar, BarChart2, FileText, Settings, HelpCircle, Send, LogOut, Users, X, Bot, Globe } from 'lucide-react';
+import { LayoutDashboard, Dog, ClipboardList, Home, HeartPulse, Calendar, BarChart2, FileText, Settings, HelpCircle, Send, LogOut, Users, X, Bot, Globe, Sparkles } from 'lucide-react';
 
 export default function InternalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -58,6 +58,19 @@ export default function InternalLayout({ children }: { children: React.ReactNode
             );
           })}
         </nav>
+        
+        {/* MONITOREO IA - ADMIN ONLY */}
+        <div style={{margin: '1.5rem 1rem 0 1rem', padding: '1rem', backgroundColor: '#f0fdf4', borderRadius: '12px', border: '1px solid #bbf7d0'}}>
+          <div style={{fontSize: '0.75rem', fontWeight: 700, color: '#166534', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '6px'}}>
+            <Sparkles size={14}/> MONITOREO LLaMA 3
+          </div>
+          <div style={{fontSize: '1.25rem', fontWeight: 800, color: '#16a34a'}}>$0.00 USD</div>
+          <div style={{fontSize: '0.7rem', color: '#15803d', marginBottom: '0.5rem'}}>Costo Real (Groq Gratis)</div>
+          <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#166534', borderTop: '1px solid #bbf7d0', paddingTop: '0.5rem'}}>
+            <span>Tokens: ~1,250</span>
+            <span style={{fontWeight: 700}}>Ahorro: $0.05</span>
+          </div>
+        </div>
         
         <div style={{marginTop: '2rem'}}>
           <div style={{fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.5rem', padding: '0 1rem'}}>Cambiar de Portal</div>

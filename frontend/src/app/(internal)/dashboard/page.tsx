@@ -216,31 +216,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 5. Monitoreo de IA */}
-        <div className="bento-card col-span-1">
-          <div className="bento-title">📊 MONITOREO IA (LLaMA 3)</div>
-          <div className="stats-grid" style={{gridTemplateColumns: '1fr'}}>
-            <div className="stat-box" style={{backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0'}}>
-              <div className="icon-box green" style={{backgroundColor: '#16a34a', color: 'white'}}><Cloud size={16}/></div>
-              <div>
-                <h3 style={{color: '#166534'}}>$0.00 <span style={{fontSize: '0.8rem'}}>USD</span></h3>
-                <p style={{color: '#15803d'}}>Costo Real (Groq API)</p>
-              </div>
-            </div>
-            <div className="stat-box">
-              <div className="icon-box purple"><Activity size={16}/></div>
-              <div>
-                <h3>~1,250</h3><p>Tokens consumidos hoy</p>
-              </div>
-            </div>
-            <div className="stat-box">
-              <div className="icon-box orange"><Cloud size={16}/></div>
-              <div>
-                <h3>~$0.05</h3><p>Ahorro vs GPT-4 hoy</p>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
       </div>
     </>
