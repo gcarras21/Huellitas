@@ -22,13 +22,16 @@ export default function InternalLayout({ children }: { children: React.ReactNode
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        supabase.from('profiles').select('role').eq('id', session.user.id).single().then(({data}) => {
-          if (data && data.role === 'adoptante') {
-            router.push('/mi-cuenta');
-          }
-        });
+      if (!session) {
+        router.push('/login');
+        return;
       }
+      
+      supabase.from('profiles').select('role').eq('id', session.user.id).single().then(({data}) => {
+        if (data && data.role === 'adoptante') {
+          router.push('/mi-cuenta');
+        }
+      });
     });
 
     // Fetch a couple of dogs to show in the AI panel dynamically

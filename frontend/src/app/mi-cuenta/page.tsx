@@ -53,9 +53,13 @@ export default function ClientDashboard() {
   useEffect(() => {
     async function loadClientData() {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-        if (profile) {
+      if (!session) {
+        router.push('/login');
+        return;
+      }
+      
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+      if (profile) {
           setUserName(profile.full_name?.split(' ')[0] || 'Adoptante');
           setFullNameInput(profile.full_name || '');
         }
