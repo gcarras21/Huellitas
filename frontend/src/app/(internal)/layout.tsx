@@ -46,6 +46,7 @@ export default function InternalLayout({ children }: { children: React.ReactNode
     { name: 'Solicitudes', icon: ClipboardList, href: '/solicitudes' },
     { name: 'Hogares Temporales', icon: Home, href: '/foster' },
     { name: 'Salud', icon: HeartPulse, href: '/health' },
+    { name: 'Seguimiento', icon: FileText, href: '/seguimiento' },
     { name: 'Eventos', icon: Calendar, href: '/events' },
     { name: 'Reportes', icon: BarChart2, href: '/reports' },
     { name: 'Personal', icon: Users, href: '/usuarios' },
