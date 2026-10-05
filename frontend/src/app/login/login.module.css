@@ -129,3 +129,37 @@
   max-width: 80%;
   line-height: 1.5;
 }
+
+/* --- MOBILE RESPONSIVE QUERIES --- */
+@media (max-width: 768px) {
+  .loginContainer {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .leftSide {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .rightSide {
+    padding: 3rem 1.5rem;
+  }
+
+  .brand {
+    margin-bottom: 2rem;
+  }
+
+  .heroImage {
+    max-width: 100%;
+  }
+
+  .rightTitle {
+    font-size: 1.8rem;
+  }
+
+  .rightSubtitle {
+    max-width: 100%;
+    font-size: 1rem;
+  }
+}
