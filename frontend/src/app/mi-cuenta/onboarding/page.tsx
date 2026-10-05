@@ -18,7 +18,7 @@ export default function OnboardingPage() {
     activity_level: 'Moderado',
     preferred_size: 'Mediano (10-25kg)',
     preferred_age_group: 'Cualquiera',
-    experience_level: 'Apto para primerizos',
+    experience_level: 'Soy primerizo (No tengo experiencia)',
   });
 
   // Verify if already has preferences
@@ -119,8 +119,8 @@ export default function OnboardingPage() {
               <div className={styles.formGroup}>
                 <label>¿Tienes experiencia previa teniendo perros?</label>
                 <select name="experience_level" value={formData.experience_level} onChange={handleChange}>
-                  <option>Apto para primerizos</option>
-                  <option>Requiere experiencia previa</option>
+                  <option>Soy primerizo (No tengo experiencia)</option>
+                  <option>Tengo experiencia previa</option>
                 </select>
               </div>
             </div>

@@ -25,8 +25,9 @@ export default function PerrosPage() {
     temperament: '',
     health_status: '',
     good_with_kids: false,
-    good_with_other_dogs: false,
-    good_with_cats: false
+    good_with_cats: false,
+    experience_level_required: 'Apto para primerizos',
+    housing_type_recommended: 'Casa chica (patio chico/sin patio)'
   });
 
   useEffect(() => {
@@ -59,7 +60,9 @@ export default function PerrosPage() {
       health_status: dog.health_status || '',
       good_with_kids: dog.good_with_kids || false,
       good_with_other_dogs: dog.good_with_other_dogs || false,
-      good_with_cats: dog.good_with_cats || false
+      good_with_cats: dog.good_with_cats || false,
+      experience_level_required: dog.experience_level_required || 'Apto para primerizos',
+      housing_type_recommended: dog.housing_type_recommended || 'Casa chica (patio chico/sin patio)'
     });
     setImageFile(null);
     setIsModalOpen(true);
@@ -67,7 +70,7 @@ export default function PerrosPage() {
 
   const handleNewClick = () => {
     setEditingDogId(null);
-    setFormData({ name: '', photo_url: '', breed: '', color: '', age_months: '', size: '', energy_level: '', temperament: '', health_status: '', good_with_kids: false, good_with_other_dogs: false, good_with_cats: false });
+    setFormData({ name: '', photo_url: '', breed: '', color: '', age_months: '', size: '', energy_level: '', temperament: '', health_status: '', good_with_kids: false, good_with_other_dogs: false, good_with_cats: false, experience_level_required: 'Apto para primerizos', housing_type_recommended: 'Casa chica (patio chico/sin patio)' });
     setImageFile(null);
     setIsModalOpen(true);
   };
@@ -116,8 +119,9 @@ export default function PerrosPage() {
       temperament: formData.temperament || null,
       health_status: formData.health_status || null,
       good_with_kids: formData.good_with_kids,
-      good_with_other_dogs: formData.good_with_other_dogs,
-      good_with_cats: formData.good_with_cats
+      good_with_cats: formData.good_with_cats,
+      experience_level_required: formData.experience_level_required,
+      housing_type_recommended: formData.housing_type_recommended
     };
 
     let error;
@@ -134,7 +138,7 @@ export default function PerrosPage() {
     } else {
       setIsModalOpen(false);
       setImageFile(null);
-      setFormData({ name: '', photo_url: '', breed: '', color: '', age_months: '', size: '', energy_level: '', temperament: '', health_status: '', good_with_kids: false, good_with_other_dogs: false, good_with_cats: false });
+      setFormData({ name: '', photo_url: '', breed: '', color: '', age_months: '', size: '', energy_level: '', temperament: '', health_status: '', good_with_kids: false, good_with_other_dogs: false, good_with_cats: false, experience_level_required: 'Apto para primerizos', housing_type_recommended: 'Casa chica (patio chico/sin patio)' });
       fetchDogs();
     }
     setUploadingImg(false);
@@ -222,19 +226,48 @@ export default function PerrosPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div className={styles.formGroup}>
-                  <label>Raza (Sugerido para ML)</label>
-                  <select name="breed" value={formData.breed} onChange={handleInputChange}>
-                    <option value="">Selecciona Raza</option>
-                    <option value="Mestizo">Mestizo</option>
-                    <option value="Labrador / Golden">Labrador / Golden</option>
-                    <option value="Chihuahua / Pomerania">Chihuahua / Pomerania</option>
-                    <option value="Pastor Alemán / Belga">Pastor Alemán / Belga</option>
-                    <option value="Pitbull / Bull Terrier">Pitbull / Bull Terrier</option>
-                    <option value="Poodle / Maltés">Poodle / Maltés</option>
-                    <option value="Husky / Malamute">Husky / Malamute</option>
-                    <option value="Schnauzer / Terrier">Schnauzer / Terrier</option>
-                    <option value="Otro">Otro</option>
-                  </select>
+                  <label>Raza (Dinámica / Autocompletado)</label>
+                  <input type="text" name="breed" list="breedOptions" value={formData.breed} onChange={handleInputChange} placeholder="Escribe o selecciona..." />
+                  <datalist id="breedOptions">
+                    <option value="Mestizo Pequeño" />
+                    <option value="Mestizo Mediano" />
+                    <option value="Mestizo Grande" />
+                    <option value="Cruza de Labrador" />
+                    <option value="Cruza de Pitbull/Terrier" />
+                    <option value="Cruza de Pastor Alemán" />
+                    <option value="Cruza de Husky" />
+                    <option value="Cruza de Chihuahua" />
+                    <option value="Cruza de Poodle/Doodle" />
+                    <option value="Akita" />
+                    <option value="Beagle" />
+                    <option value="Basset Hound" />
+                    <option value="Border Collie" />
+                    <option value="Boston Terrier" />
+                    <option value="Boxer" />
+                    <option value="Bulldog Francés" />
+                    <option value="Bulldog Inglés" />
+                    <option value="Bull Terrier" />
+                    <option value="Caniche/Poodle" />
+                    <option value="Chihuahua" />
+                    <option value="Chow Chow" />
+                    <option value="Cocker Spaniel" />
+                    <option value="Dachshund (Salchicha)" />
+                    <option value="Dóberman" />
+                    <option value="Gran Danés" />
+                    <option value="Golden Retriever" />
+                    <option value="Husky Siberiano" />
+                    <option value="Labrador Retriever" />
+                    <option value="Malinois" />
+                    <option value="Pastor Alemán" />
+                    <option value="Pastor Australiano" />
+                    <option value="Pitbull" />
+                    <option value="Pomerania" />
+                    <option value="Pug" />
+                    <option value="Rottweiler" />
+                    <option value="Schnauzer" />
+                    <option value="Shih Tzu" />
+                    <option value="Yorkshire Terrier" />
+                  </datalist>
                 </div>
                 
                 <div className={styles.formGroup}>
@@ -262,9 +295,9 @@ export default function PerrosPage() {
                   <label>Tamaño</label>
                   <select name="size" value={formData.size} onChange={handleInputChange}>
                     <option value="">Desconocido</option>
-                    <option value="Small">Pequeño</option>
-                    <option value="Medium">Mediano</option>
-                    <option value="Large">Grande</option>
+                    <option value="Pequeño (<10kg)">Pequeño (&lt;10kg)</option>
+                    <option value="Mediano (10-25kg)">Mediano (10-25kg)</option>
+                    <option value="Grande (>25kg)">Grande (&gt;25kg)</option>
                   </select>
                 </div>
               </div>
@@ -274,9 +307,9 @@ export default function PerrosPage() {
                   <label>Nivel de Energía</label>
                   <select name="energy_level" value={formData.energy_level} onChange={handleInputChange}>
                     <option value="">Desconocido</option>
-                    <option value="Low">Bajo</option>
-                    <option value="Medium">Medio</option>
-                    <option value="High">Alto</option>
+                    <option value="Bajo">Bajo</option>
+                    <option value="Moderado">Moderado</option>
+                    <option value="Alto">Alto</option>
                   </select>
                 </div>
 
@@ -299,16 +332,35 @@ export default function PerrosPage() {
                 </div>
               </div>
 
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                <div className={styles.formGroup}>
+                  <label>Temperamento (Actitud)</label>
+                  <select name="temperament" value={formData.temperament} onChange={handleInputChange}>
+                    <option value="">Selecciona Temperamento</option>
+                    <option value="Juguetón/Activo">Juguetón/Activo</option>
+                    <option value="Tranquilo/Calmo">Tranquilo/Calmo</option>
+                    <option value="Cariñoso/Encimoso">Cariñoso/Encimoso</option>
+                    <option value="Protector/Alerta">Protector/Alerta</option>
+                    <option value="Tímido/Asustadizo">Tímido/Asustadizo</option>
+                    <option value="Independiente">Independiente</option>
+                  </select>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>Nivel de Experiencia Requerido</label>
+                  <select name="experience_level_required" value={formData.experience_level_required} onChange={handleInputChange}>
+                    <option value="Apto para primerizos">Apto para primerizos</option>
+                    <option value="Requiere experiencia">Requiere experiencia</option>
+                  </select>
+                </div>
+              </div>
+
               <div className={styles.formGroup}>
-                <label>Temperamento (Actitud)</label>
-                <select name="temperament" value={formData.temperament} onChange={handleInputChange}>
-                  <option value="">Selecciona Temperamento</option>
-                  <option value="Juguetón / Activo">Juguetón / Activo</option>
-                  <option value="Tranquilo / Relajado">Tranquilo / Relajado</option>
-                  <option value="Tímido / Miedoso">Tímido / Miedoso</option>
-                  <option value="Protector / Guardián">Protector / Guardián</option>
-                  <option value="Cariñoso / Apegado">Cariñoso / Apegado</option>
-                  <option value="Independiente">Independiente</option>
+                <label>Espacio Recomendado / Vivienda</label>
+                <select name="housing_type_recommended" value={formData.housing_type_recommended} onChange={handleInputChange}>
+                  <option value="Departamento / Espacio chico">Departamento / Espacio chico</option>
+                  <option value="Casa chica (patio chico/sin patio)">Casa chica (patio chico/sin patio)</option>
+                  <option value="Casa grande (patio amplio/jardín)">Casa grande (patio amplio/jardín)</option>
                 </select>
               </div>
 
