@@ -4,13 +4,16 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { LayoutDashboard, Dog, ClipboardList, Home, HeartPulse, Calendar, BarChart2, FileText, Settings, HelpCircle, Send, LogOut, Users, X, Bot, Globe, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Dog, ClipboardList, Home, HeartPulse, Calendar, BarChart2, FileText, Settings, HelpCircle, Send, LogOut, Users, X, Bot, Globe, Sparkles, Menu } from 'lucide-react';
 
 export default function InternalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [aiDogs, setAiDogs] = useState<any[]>([]);
   const [isAiOpen, setIsAiOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -48,8 +51,23 @@ export default function InternalLayout({ children }: { children: React.ReactNode
 
   return (
     <div className="master-layout">
+      {/* --- MOBILE TOP BAR --- */}
+      <div className="mobile-top-bar">
+        <button onClick={() => setIsMobileMenuOpen(true)} style={{background:'none', border:'none', color:'var(--text-dark)', display:'flex'}}>
+          <Menu size={24} />
+        </button>
+        <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+          <Dog size={24} color="var(--primary-orange)" />
+          <span>Huellitas</span>
+        </div>
+      </div>
+
+      {isMobileMenuOpen && (
+        <div className="mobile-overlay" onClick={closeMobileMenu}></div>
+      )}
+
       {/* --- SIDEBAR --- */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
         <div className="brand">
           <Dog size={28} color="var(--primary-orange)" />
           <div>
@@ -62,7 +80,7 @@ export default function InternalLayout({ children }: { children: React.ReactNode
           {navItems.map((item) => {
             const isActive = pathname === item.href || (pathname === '/' && item.href === '/dashboard');
             return (
-              <Link key={item.name} href={item.href} className={`nav-item ${isActive ? 'active' : ''}`}>
+              <Link key={item.name} href={item.href} onClick={closeMobileMenu} className={`nav-item ${isActive ? 'active' : ''}`}>
                 <item.icon size={18} />
                 {item.name}
               </Link>
