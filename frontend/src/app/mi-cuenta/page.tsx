@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { supabase } from '@/lib/supabase/client';
 import { FileUp, Sparkles, Dog, CheckCircle2, Circle, Clock, Home, ClipboardList, Settings, LogOut, ArrowLeftRight, Bot, Send, User, Menu, X } from 'lucide-react';
 import styles from './mi-cuenta.module.css';
 
