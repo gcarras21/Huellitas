@@ -62,7 +62,7 @@ export default function ClientDashboard() {
         // Fetch their adoption requests
         const { data: reqs } = await supabase.from('adoption_requests')
           .select('*, dogs(name, photo_url)')
-          .eq('user_id', session.user.id);
+          .eq('client_id', session.user.id);
         
         if (reqs) setMyRequests(reqs);
 
