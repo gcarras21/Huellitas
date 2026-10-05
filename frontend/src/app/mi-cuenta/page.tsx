@@ -4,7 +4,9 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { FileUp, Sparkles, Dog, CheckCircle2, Circle, Clock, Home, ClipboardList, Settings, LogOut, ArrowLeftRight, Bot, Send, User } from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
+import { FileUp, Sparkles, Dog, CheckCircle2, Circle, Clock, Home, ClipboardList, Settings, LogOut, ArrowLeftRight, Bot, Send, User, Menu, X } from 'lucide-react';
+import styles from './mi-cuenta.module.css';
 
 export default function ClientDashboard() {
   const router = useRouter();
@@ -17,6 +19,7 @@ export default function ClientDashboard() {
   const [chatOpen, setChatOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [fullNameInput, setFullNameInput] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -108,10 +111,14 @@ export default function ClientDashboard() {
   };
 
   return (
-    <div style={{display: 'flex', height: '100vh', backgroundColor: '#f8fafc', fontFamily: "'Outfit', sans-serif"}}>
+    <div className={styles.container}>
       {/* --- SIDEBAR DEL CLIENTE --- */}
-      <aside style={{width: '260px', backgroundColor: 'white', borderRight: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', padding: '1.5rem', flexShrink: 0}}>
+      <aside className={`${styles.sidebar} ${isMobileMenuOpen ? styles.open : ''}`}>
         
+        <button className={styles.closeSidebarBtn} onClick={() => setIsMobileMenuOpen(false)}>
+          <X size={24} />
+        </button>
+
         <div style={{display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.25rem', fontWeight: 700, color: '#1e293b', marginBottom: '2.5rem'}}>
           <Dog size={24} color="var(--primary-orange)" />
           <div>
@@ -121,16 +128,16 @@ export default function ClientDashboard() {
         </div>
 
         <nav style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', flexGrow: 1}}>
-          <div onClick={() => {setChatOpen(false); setCatalogOpen(false); setProfileOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: (!chatOpen && !catalogOpen && !profileOpen) ? 'var(--primary-orange-light)' : 'transparent', color: (!chatOpen && !catalogOpen && !profileOpen) ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+          <div onClick={() => {setChatOpen(false); setCatalogOpen(false); setProfileOpen(false); setIsMobileMenuOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: (!chatOpen && !catalogOpen && !profileOpen) ? 'var(--primary-orange-light)' : 'transparent', color: (!chatOpen && !catalogOpen && !profileOpen) ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Home size={18}/> Mi Inicio
           </div>
-          <div onClick={() => {setChatOpen(true); setCatalogOpen(false); setProfileOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: chatOpen ? 'var(--primary-orange-light)' : 'transparent', color: chatOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+          <div onClick={() => {setChatOpen(true); setCatalogOpen(false); setProfileOpen(false); setIsMobileMenuOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: chatOpen ? 'var(--primary-orange-light)' : 'transparent', color: chatOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Bot size={18}/> Huellitas AI
           </div>
-          <div onClick={() => {setChatOpen(false); setCatalogOpen(true); setProfileOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: catalogOpen ? 'var(--primary-orange-light)' : 'transparent', color: catalogOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+          <div onClick={() => {setChatOpen(false); setCatalogOpen(true); setProfileOpen(false); setIsMobileMenuOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: catalogOpen ? 'var(--primary-orange-light)' : 'transparent', color: catalogOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Dog size={18}/> Catálogo de Perros
           </div>
-          <div onClick={() => {setChatOpen(false); setCatalogOpen(false); setProfileOpen(true);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: profileOpen ? 'var(--primary-orange-light)' : 'transparent', color: profileOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+          <div onClick={() => {setChatOpen(false); setCatalogOpen(false); setProfileOpen(true); setIsMobileMenuOpen(false);}} style={{padding: '0.8rem 1rem', borderRadius: '8px', backgroundColor: profileOpen ? 'var(--primary-orange-light)' : 'transparent', color: profileOpen ? 'var(--primary-orange)' : '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
             <Settings size={18}/> Mi Perfil
           </div>
         </nav>
@@ -159,7 +166,10 @@ export default function ClientDashboard() {
       </aside>
 
       {/* --- MAIN CONTENT --- */}
-      <main style={{flexGrow: 1, padding: '3rem 4rem', overflowY: 'auto'}}>
+      <main className={styles.main}>
+        <button className={styles.mobileMenuBtn} onClick={() => setIsMobileMenuOpen(true)}>
+          <Menu size={24} /> Menú
+        </button>
         
         <h1 style={{fontSize: '1.75rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem'}}>¡Hola, {userName}! 👋</h1>
         <p style={{color: '#64748b', marginBottom: '2.5rem'}}>Este es el centro de control de tu proceso de adopción.</p>
@@ -228,7 +238,7 @@ export default function ClientDashboard() {
         {catalogOpen && (
           <div style={{marginBottom: '2.5rem'}}>
              <h2 style={{fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '1.5rem'}}>Catálogo de Perros en Adopción</h2>
-             <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.5rem'}}>
+             <div className={styles.catalogGrid}>
                {allDogs.map(dog => (
                  <div key={dog.id} style={{backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.02)'}}>
                    <img src={dog.photo_url || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop"} alt={dog.name} style={{width: '100%', height: '180px', objectFit: 'contain', backgroundColor: '#f1f5f9'}} />
@@ -280,7 +290,7 @@ export default function ClientDashboard() {
         )}
 
         {!chatOpen && !catalogOpen && !profileOpen && (
-          <div style={{display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem'}}>
+          <div className={styles.grid}>
           
           {/* --- TRACKER DE ADOPCIÓN --- */}
           <div>
