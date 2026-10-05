@@ -60,24 +60,25 @@ export default function ClientDashboard() {
       
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
       if (profile) {
-          setUserName(profile.full_name?.split(' ')[0] || 'Adoptante');
-          setFullNameInput(profile.full_name || '');
-        }
-        setUserEmail(session.user.email || '');
-
-        // Fetch their adoption requests
-        const { data: reqs } = await supabase.from('adoption_requests')
-          .select('*, dogs(name, photo_url)')
-          .eq('client_id', session.user.id);
-        
-        if (reqs) setMyRequests(reqs);
-
-        // Fetch all dogs for AI visual matching
-        const { data: dogs } = await supabase.from('dogs').select('*');
-        if (dogs) setAllDogs(dogs);
+        setUserName(profile.full_name?.split(' ')[0] || 'Adoptante');
+        setFullNameInput(profile.full_name || '');
       }
+      setUserEmail(session.user.email || '');
+
+      // Fetch their adoption requests
+      const { data: reqs } = await supabase.from('adoption_requests')
+        .select('*, dogs(name, photo_url)')
+        .eq('client_id', session.user.id);
+      
+      if (reqs) setMyRequests(reqs);
+
+      // Fetch all dogs for AI visual matching
+      const { data: dogs } = await supabase.from('dogs').select('*');
+      if (dogs) setAllDogs(dogs);
+      
       setLoading(false);
     }
+    
     loadClientData();
   }, []);
 
