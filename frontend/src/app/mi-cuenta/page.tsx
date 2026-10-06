@@ -56,11 +56,15 @@ export default function ClientDashboard() {
 
   const loadAIRecommendations = async (userId: string) => {
     try {
+      const { data: prefs } = await supabase.from('user_preferences').select('*').eq('user_id', userId).single();
+      const { data: favs } = await supabase.from('user_favorites').select('dog_id').eq('user_id', userId);
+      const fav_dog_ids = favs ? favs.map(f => f.dog_id) : [];
+
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
       const matchResponse = await fetch(`${backendUrl}/api/match`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId })
+        body: JSON.stringify({ user_id: userId, prefs: prefs || {}, fav_dog_ids })
       });
       const matchData = await matchResponse.json();
       if (matchData.matches) setMatchDogs(matchData.matches);
@@ -359,6 +363,7 @@ export default function ClientDashboard() {
                 <h2>¡Has visto a todos!</h2>
                 <p>O tal vez aplicamos filtros muy estrictos.</p>
                 <button onClick={() => loadAIRecommendations(session?.user?.id)}>Volver a cargar recomendaciones</button>
+                <button onClick={() => router.push('/mi-cuenta/onboarding?edit=true')} style={{marginTop: '1rem', backgroundColor: 'transparent', border: '1px solid var(--primary-orange)', color: 'var(--primary-orange)'}}>Actualizar mis preferencias</button>
               </div>
             )}
             

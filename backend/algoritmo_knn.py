@@ -15,8 +15,9 @@ def map_energy(val):
 
 def map_exp(val):
     v = str(val).lower()
+    if "no tengo experiencia" in v or "primerizo" in v: return 1
     if "experiencia" in v: return 2
-    return 1 # Primerizo
+    return 1 # Primerizo por defecto
 
 def map_house(val):
     v = str(val).lower()

@@ -2,6 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Any
 from dotenv import load_dotenv
 from groq import Groq
 from supabase import create_client, Client
@@ -84,16 +85,15 @@ async def chat_with_ai(request: ChatRequest):
 
 class MatchRequest(BaseModel):
     user_id: str
+    prefs: dict[str, Any]
+    fav_dog_ids: list[str]
 
 @app.post("/api/match")
 async def get_huellitas_match(request: MatchRequest):
     try:
-        # 1. Extraer preferencias
-        prefs_res = supabase.table("user_preferences").select("*").eq("user_id", request.user_id).execute()
-        if not prefs_res.data:
+        prefs = request.prefs
+        if not prefs:
             return {"error": "Preferencias no encontradas"}
-        
-        prefs = prefs_res.data[0]
         
         # 2. Extraer perros (filtramos en memoria por is_adopted)
         dogs_res = supabase.table("dogs").select("*").execute()
@@ -102,9 +102,7 @@ async def get_huellitas_match(request: MatchRequest):
         if not all_dogs:
             return {"matches": []}
             
-        # 3. Extraer favoritos para excluir
-        fav_res = supabase.table("user_favorites").select("dog_id").eq("user_id", request.user_id).execute()
-        fav_dog_ids = [f['dog_id'] for f in fav_res.data]
+        fav_dog_ids = request.fav_dog_ids
         
         # 4. Calcular Match usando el Algoritmo KNN externo
         scored_dogs = calcular_match(prefs, all_dogs, fav_dog_ids)

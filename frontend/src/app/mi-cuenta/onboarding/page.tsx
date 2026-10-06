@@ -26,9 +26,12 @@ export default function OnboardingPage() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) router.push('/login');
       else {
-        supabase.from('user_preferences').select('user_id').eq('user_id', session.user.id).single().then(({ data }) => {
-          if (data) router.push('/mi-cuenta'); // Already completed
-        });
+        const searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.get('edit') !== 'true') {
+          supabase.from('user_preferences').select('user_id').eq('user_id', session.user.id).single().then(({ data }) => {
+            if (data) router.push('/mi-cuenta'); // Already completed
+          });
+        }
       }
     });
   }, [router]);
@@ -49,7 +52,7 @@ export default function OnboardingPage() {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
 
-    const { error } = await supabase.from('user_preferences').insert({
+    const { error } = await supabase.from('user_preferences').upsert({
       user_id: session.user.id,
       ...formData
     });
