@@ -15,6 +15,7 @@ export default function OnboardingPage() {
     has_kids: false,
     has_dogs: false,
     has_cats: false,
+    adults_only: false,
     activity_level: 'Moderado',
     preferred_size: 'Mediano (10-25kg)',
     preferred_age_group: 'Cualquiera',
@@ -41,10 +42,19 @@ export default function OnboardingPage() {
 
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    if (type === 'checkbox') {
+      if (name === 'adults_only') {
+        if (checked) {
+          setFormData(prev => ({ ...prev, adults_only: true, has_kids: false, has_dogs: false, has_cats: false }));
+        } else {
+          setFormData(prev => ({ ...prev, adults_only: false }));
+        }
+      } else {
+        setFormData(prev => ({ ...prev, [name]: checked, adults_only: checked ? false : prev.adults_only }));
+      }
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async () => {
@@ -103,6 +113,10 @@ export default function OnboardingPage() {
                 <label className={styles.checkboxLabel}>
                   <input type="checkbox" name="has_cats" checked={formData.has_cats} onChange={handleChange} />
                   Tengo gatos
+                </label>
+                <label className={styles.checkboxLabel}>
+                  <input type="checkbox" name="adults_only" checked={formData.adults_only} onChange={handleChange} />
+                  Solo adultos (Sin niños ni otras mascotas)
                 </label>
               </div>
             </div>
