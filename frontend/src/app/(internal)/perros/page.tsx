@@ -25,6 +25,7 @@ export default function PerrosPage() {
     temperament: '',
     health_status: '',
     good_with_kids: false,
+    good_with_other_dogs: false,
     good_with_cats: false,
     experience_level_required: 'Apto para primerizos',
     housing_type_recommended: 'Casa chica (patio chico/sin patio)'
@@ -119,6 +120,7 @@ export default function PerrosPage() {
       temperament: formData.temperament || null,
       health_status: formData.health_status || null,
       good_with_kids: formData.good_with_kids,
+      good_with_other_dogs: formData.good_with_other_dogs,
       good_with_cats: formData.good_with_cats,
       experience_level_required: formData.experience_level_required,
       housing_type_recommended: formData.housing_type_recommended
