@@ -130,8 +130,8 @@ export default function ClientDashboard() {
   };
 
   const removeFavorite = async (favId: string, dogId: string) => {
-    await supabase.from('user_favorites').delete().eq('id', favId);
-    setFavoriteDogs(prev => prev.filter(f => f.id !== favId));
+    await supabase.from('user_favorites').delete().eq('user_id', session.user.id).eq('dog_id', dogId);
+    setFavoriteDogs(prev => prev.filter(f => f.dogs.id !== dogId));
     // After removing from favorites, it could appear in match again if we reload
     loadAIRecommendations(session.user.id);
   };
