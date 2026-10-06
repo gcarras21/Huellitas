@@ -136,6 +136,30 @@ export default function ClientDashboard() {
     loadAIRecommendations(session.user.id);
   };
 
+  const requestAdoption = async (dogId: string) => {
+    const existing = myRequests.find(r => r.dog_id === dogId);
+    if (existing) {
+        alert("Ya tienes una solicitud activa para este perrito.");
+        return;
+    }
+
+    const { data, error } = await supabase.from('adoption_requests').insert({
+        client_id: session.user.id,
+        dog_id: dogId,
+        status: 'pending'
+    }).select('*, dogs(name, photo_url)').single();
+
+    if (error) {
+        alert("Hubo un error al enviar tu solicitud.");
+        console.error(error);
+        return;
+    }
+
+    setMyRequests(prev => [data, ...prev]);
+    alert("¡Solicitud de adopción enviada con éxito! Nos pondremos en contacto contigo pronto.");
+    switchView('inicio');
+  };
+
   const getStepProgress = (status: string) => {
     if (status === 'pending') return 1;
     if (status === 'interview') return 2;
@@ -395,9 +419,15 @@ export default function ClientDashboard() {
                     <img src={fav.dogs.photo_url || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop"} alt={fav.dogs.name} style={{width: '100%', height: '180px', objectFit: 'cover'}} />
                     <div style={{padding: '1rem'}}>
                       <h3 style={{fontSize: '1.1rem', fontWeight: 700, margin: '0 0 0.5rem 0'}}>{fav.dogs.name}</h3>
-                      <button style={{width: '100%', backgroundColor: 'var(--primary-orange)', color: 'white', border: 'none', padding: '0.6rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer'}}>
-                        Solicitar Adopción
-                      </button>
+                      {myRequests.find(r => r.dog_id === fav.dogs.id) ? (
+                        <button disabled style={{width: '100%', backgroundColor: '#e2e8f0', color: '#94a3b8', border: 'none', padding: '0.6rem', borderRadius: '8px', fontWeight: 600, cursor: 'not-allowed'}}>
+                          Solicitud en Proceso
+                        </button>
+                      ) : (
+                        <button onClick={() => requestAdoption(fav.dogs.id)} style={{width: '100%', backgroundColor: 'var(--primary-orange)', color: 'white', border: 'none', padding: '0.6rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer'}}>
+                          Solicitar Adopción
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
