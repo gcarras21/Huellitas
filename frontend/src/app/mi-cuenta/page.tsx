@@ -40,8 +40,7 @@ export default function ClientDashboard() {
     setIsTyping(true);
 
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
-      const response = await fetch(`${backendUrl}/api/chat`, {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMsg })
@@ -60,8 +59,7 @@ export default function ClientDashboard() {
       const { data: favs } = await supabase.from('user_favorites').select('dog_id').eq('user_id', userId);
       const fav_dog_ids = favs ? favs.map(f => f.dog_id) : [];
 
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
-      const matchResponse = await fetch(`${backendUrl}/api/match`, {
+      const matchResponse = await fetch('/api/match', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, prefs: prefs || {}, fav_dog_ids })
