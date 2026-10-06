@@ -56,15 +56,6 @@ def calcular_match(prefs, all_dogs, fav_dog_ids):
         if d['id'] in fav_dog_ids:
             continue
             
-        # Reglas de convivencia duras (Hard Constraints)
-        # Solo excluimos si el perro dice explicitamente False (que NO es apto). Si es None, lo dejamos pasar.
-        if prefs.get("has_kids") and d.get("good_with_kids") is False:
-            continue
-        if prefs.get("has_cats") and d.get("good_with_cats") is False:
-            continue
-        if prefs.get("has_dogs") and d.get("good_with_other_dogs") is False:
-            continue
-            
         # Vector del perro
         D = [
             map_size(d.get("size", "")),
@@ -77,6 +68,14 @@ def calcular_match(prefs, all_dogs, fav_dog_ids):
         # Distancia Euclidiana (KNN core logic)
         dist = distance.euclidean(U, D)
         match_pct = max(0, int((1 - (dist / max_dist)) * 100))
+        
+        # Penalizacion estricta (bajamos a 0% la compatibilidad pero lo mostramos para que el usuario decida)
+        if prefs.get("has_kids") and d.get("good_with_kids") is False:
+            match_pct = 0
+        if prefs.get("has_cats") and d.get("good_with_cats") is False:
+            match_pct = 0
+        if prefs.get("has_dogs") and d.get("good_with_other_dogs") is False:
+            match_pct = 0
         
         # Sugerimos todos los perros y ordenamos, el límite de 30% lo quitamos para que siempre muestre cartas
         if match_pct >= 0:

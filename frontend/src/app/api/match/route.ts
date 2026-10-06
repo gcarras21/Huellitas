@@ -73,10 +73,6 @@ export async function POST(request: Request) {
         for (const d of all_dogs) {
             if (fav_dog_ids.includes(d.id)) continue;
 
-            if (prefs.has_kids && d.good_with_kids === false) continue;
-            if (prefs.has_cats && d.good_with_cats === false) continue;
-            if (prefs.has_dogs && d.good_with_other_dogs === false) continue;
-
             const D = [
                 map_size(d.size || ""),
                 map_energy(d.energy_level || ""),
@@ -86,7 +82,11 @@ export async function POST(request: Request) {
             ];
 
             const dist = euclideanDistance(U, D);
-            const match_pct = Math.max(0, Math.floor((1 - (dist / max_dist)) * 100));
+            let match_pct = Math.max(0, Math.floor((1 - (dist / max_dist)) * 100));
+
+            if (prefs.has_kids && d.good_with_kids === false) match_pct = 0;
+            if (prefs.has_cats && d.good_with_cats === false) match_pct = 0;
+            if (prefs.has_dogs && d.good_with_other_dogs === false) match_pct = 0;
 
             if (match_pct >= 0) {
                 scored_dogs.push({ ...d, match_percentage: match_pct });
