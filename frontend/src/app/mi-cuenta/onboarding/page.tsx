@@ -62,9 +62,11 @@ export default function OnboardingPage() {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
 
+    const { adults_only, ...dbData } = formData;
+
     const { error } = await supabase.from('user_preferences').upsert({
       user_id: session.user.id,
-      ...formData
+      ...dbData
     });
 
     setLoading(false);
