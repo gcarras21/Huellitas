@@ -464,7 +464,10 @@ export default function ClientDashboard() {
               {messages.map((msg, i) => (
                 <div key={i} style={{alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '80%', display: 'flex', gap: '12px'}}>
                   {msg.role === 'ai' && <div style={{width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--primary-orange-light)', color: 'var(--primary-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Bot size={18}/></div>}
-                  <div style={{backgroundColor: msg.role === 'user' ? 'var(--primary-orange)' : '#f1f5f9', color: msg.role === 'user' ? 'white' : '#334155', padding: '0.75rem 1rem', borderRadius: '12px', fontSize: '0.95rem'}}>{msg.content}</div>
+                  <div 
+                    style={{backgroundColor: msg.role === 'user' ? 'var(--primary-orange)' : '#f1f5f9', color: msg.role === 'user' ? 'white' : '#334155', padding: '0.75rem 1rem', borderRadius: '12px', fontSize: '0.95rem'}} 
+                    dangerouslySetInnerHTML={{ __html: msg.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
+                  />
                 </div>
               ))}
               {isTyping && <div style={{fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic'}}>Huellitas AI está escribiendo...</div>}

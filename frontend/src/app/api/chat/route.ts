@@ -10,7 +10,7 @@ export async function POST(request: Request) {
         const { message } = await request.json();
 
         // 1. Obtener perros
-        const { data: dogs } = await supabase.from('dogs').select('name, breed, size, energy_level, temperament, good_with_kids');
+        const { data: dogs } = await supabase.from('dogs').select('name, breed, size, energy_level, temperament, good_with_kids, photo_url');
 
         const system_prompt = `
     Eres 'Huellitas AI', un asistente experto en adopción de perros.
@@ -19,9 +19,8 @@ export async function POST(request: Request) {
     
     Reglas MUY IMPORTANTES:
     1. Sé EXTREMADAMENTE conciso y directo. Responde en 1 o 2 párrafos cortos como máximo.
-    2. NO uses formato markdown. Está estrictamente PROHIBIDO usar **asteriscos** para negritas o listas con viñetas. Usa texto completamente plano.
-    3. Cuando recomiendes a un perro, menciona su nombre exacto para que el sistema pueda mostrar su foto en pantalla.
-    4. Sé muy conversacional y empático.
+    2. Cuando recomiendes a un perro, DEBES incluir su foto en tu respuesta usando una etiqueta HTML válida de imagen con su 'photo_url'. Ejemplo: <br/><img src="URL" style="width: 250px; border-radius: 12px; margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+    3. Sé muy conversacional y empático. Puedes usar **negritas** para enfatizar.
     `;
 
         const groqKey = process.env.GROQ_API_KEY;
