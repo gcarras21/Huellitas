@@ -22,6 +22,7 @@ export default function ClientDashboard() {
   // View State
   const [currentView, setCurrentView] = useState('inicio'); // inicio, chat, catalog, profile, match, favorites
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [selectedDog, setSelectedDog] = useState<any>(null);
   const [fullNameInput, setFullNameInput] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -171,10 +172,10 @@ export default function ClientDashboard() {
           if (dog) {
             return (
               <div key={index} style={{marginTop: '1rem', marginBottom: '0.5rem', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', backgroundColor: 'white', maxWidth: '240px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)'}}>
-                <img src={dog.photo_url || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop"} alt={dog.name} style={{width: '100%', height: '180px', objectFit: 'cover'}} />
+                <img src={dog.photo_url || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop"} alt={dog.name} style={{width: '100%', height: '180px', objectFit: 'contain', backgroundColor: '#f8fafc'}} />
                 <div style={{padding: '1rem', textAlign: 'center'}}>
                   <h4 style={{margin: '0 0 0.5rem 0', color: '#1e293b', fontSize: '1.1rem'}}>{dog.name}</h4>
-                  <button onClick={() => alert(`${dog.name} es ${dog.temperament}.\nEnergía: ${dog.energy_level}\nTamaño: ${dog.size}\nAdecuado para niños: ${dog.good_with_kids ? 'Sí' : 'No'}`)} style={{backgroundColor: 'var(--primary-orange-light)', color: 'var(--primary-orange)', border: 'none', padding: '0.5rem 0.8rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', width: '100%', transition: 'background-color 0.2s'}}>
+                  <button onClick={() => setSelectedDog(dog)} style={{backgroundColor: 'var(--primary-orange-light)', color: 'var(--primary-orange)', border: 'none', padding: '0.5rem 0.8rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', width: '100%', transition: 'background-color 0.2s'}}>
                     Ver más información
                   </button>
                 </div>
@@ -517,6 +518,56 @@ export default function ClientDashboard() {
               <input type="email" value={userEmail} readOnly style={{width: '100%', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', color: '#94a3b8'}} /></div>
               <button onClick={updateProfile} style={{backgroundColor: 'var(--primary-orange)', color: 'white', border: 'none', padding: '0.8rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer'}}>Guardar Cambios</button>
             </div>
+          </div>
+        )}
+
+        {/* --- DOG INFO MODAL --- */}
+        {selectedDog && (
+          <div style={{position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', backdropFilter: 'blur(4px)'}}>
+            <div style={{backgroundColor: 'white', borderRadius: '20px', width: '100%', maxWidth: '450px', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', animation: 'slideUp 0.3s ease-out'}}>
+              <div style={{position: 'relative', height: '250px', backgroundColor: '#f8fafc'}}>
+                <button onClick={() => setSelectedDog(null)} style={{position: 'absolute', top: '15px', right: '15px', backgroundColor: 'rgba(255,255,255,0.9)', border: 'none', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10, boxShadow: '0 2px 10px rgba(0,0,0,0.1)'}}>
+                  <X size={20} color="#334155" />
+                </button>
+                <img src={selectedDog.photo_url || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop"} alt={selectedDog.name} style={{width: '100%', height: '100%', objectFit: 'contain'}} />
+              </div>
+              <div style={{padding: '2rem'}}>
+                <h2 style={{fontSize: '1.75rem', fontWeight: 800, color: '#1e293b', margin: '0 0 1.5rem 0', textAlign: 'center'}}>{selectedDog.name}</h2>
+                
+                <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid #e2e8f0'}}>
+                    <span style={{color: '#64748b', fontSize: '0.9rem', fontWeight: 600}}>Raza</span>
+                    <span style={{color: '#334155', fontWeight: 700}}>{selectedDog.breed || 'Mestizo'}</span>
+                  </div>
+                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid #e2e8f0'}}>
+                    <span style={{color: '#64748b', fontSize: '0.9rem', fontWeight: 600}}>Temperamento</span>
+                    <span style={{color: '#334155', fontWeight: 700}}>{selectedDog.temperament || 'Amigable'}</span>
+                  </div>
+                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid #e2e8f0'}}>
+                    <span style={{color: '#64748b', fontSize: '0.9rem', fontWeight: 600}}>Energía</span>
+                    <span style={{backgroundColor: 'var(--primary-orange-light)', color: 'var(--primary-orange)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 700}}>{selectedDog.energy_level || 'Media'}</span>
+                  </div>
+                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid #e2e8f0'}}>
+                    <span style={{color: '#64748b', fontSize: '0.9rem', fontWeight: 600}}>Tamaño</span>
+                    <span style={{color: '#334155', fontWeight: 700}}>{selectedDog.size || 'Mediano'}</span>
+                  </div>
+                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <span style={{color: '#64748b', fontSize: '0.9rem', fontWeight: 600}}>Apto para niños</span>
+                    <span style={{color: selectedDog.good_with_kids ? '#10b981' : '#ef4444', fontWeight: 700}}>{selectedDog.good_with_kids ? 'Sí' : 'No'}</span>
+                  </div>
+                </div>
+
+                <button onClick={() => { switchView('match'); setSelectedDog(null); }} style={{width: '100%', marginTop: '2rem', padding: '1rem', backgroundColor: 'var(--primary-orange)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(249, 115, 22, 0.3)'}}>
+                  <Sparkles size={20} /> Conocer en Huellita Match
+                </button>
+              </div>
+            </div>
+            <style dangerouslySetInnerHTML={{__html: \`
+              @keyframes slideUp {
+                from { opacity: 0; transform: translateY(20px) scale(0.95); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
+              }
+            \`}} />
           </div>
         )}
 
