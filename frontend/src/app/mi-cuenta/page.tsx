@@ -160,6 +160,35 @@ export default function ClientDashboard() {
     switchView('inicio');
   };
 
+  const renderChatMessage = (content: string) => {
+    const parts = content.split(/(\[DOG_CARD:.*?\])/g);
+    return parts.map((part, index) => {
+      if (part.startsWith('[DOG_CARD:') && part.endsWith(']')) {
+        const dogNameMatch = part.match(/\[DOG_CARD:\s*(.*?)\]/);
+        if (dogNameMatch) {
+          const dogName = dogNameMatch[1].trim();
+          const dog = allDogs.find(d => d.name.toLowerCase() === dogName.toLowerCase());
+          if (dog) {
+            return (
+              <div key={index} style={{marginTop: '1rem', marginBottom: '0.5rem', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', backgroundColor: 'white', maxWidth: '240px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)'}}>
+                <img src={dog.photo_url || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop"} alt={dog.name} style={{width: '100%', height: '180px', objectFit: 'cover'}} />
+                <div style={{padding: '1rem', textAlign: 'center'}}>
+                  <h4 style={{margin: '0 0 0.5rem 0', color: '#1e293b', fontSize: '1.1rem'}}>{dog.name}</h4>
+                  <button onClick={() => alert(`${dog.name} es ${dog.temperament}.\nEnergía: ${dog.energy_level}\nTamaño: ${dog.size}\nAdecuado para niños: ${dog.good_with_kids ? 'Sí' : 'No'}`)} style={{backgroundColor: 'var(--primary-orange-light)', color: 'var(--primary-orange)', border: 'none', padding: '0.5rem 0.8rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', width: '100%', transition: 'background-color 0.2s'}}>
+                    Ver más información
+                  </button>
+                </div>
+              </div>
+            );
+          }
+        }
+        return null;
+      }
+      
+      return <span key={index} dangerouslySetInnerHTML={{ __html: part.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>') }} style={{display: 'inline-block'}} />;
+    });
+  };
+
   const getStepProgress = (status: string) => {
     if (status === 'pending') return 1;
     if (status === 'interview') return 2;
@@ -464,10 +493,9 @@ export default function ClientDashboard() {
               {messages.map((msg, i) => (
                 <div key={i} style={{alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '80%', display: 'flex', gap: '12px'}}>
                   {msg.role === 'ai' && <div style={{width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--primary-orange-light)', color: 'var(--primary-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Bot size={18}/></div>}
-                  <div 
-                    style={{backgroundColor: msg.role === 'user' ? 'var(--primary-orange)' : '#f1f5f9', color: msg.role === 'user' ? 'white' : '#334155', padding: '0.75rem 1rem', borderRadius: '12px', fontSize: '0.95rem'}} 
-                    dangerouslySetInnerHTML={{ __html: msg.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
-                  />
+                  <div style={{backgroundColor: msg.role === 'user' ? 'var(--primary-orange)' : '#f1f5f9', color: msg.role === 'user' ? 'white' : '#334155', padding: '0.75rem 1rem', borderRadius: '12px', fontSize: '0.95rem'}}>
+                    {renderChatMessage(msg.content)}
+                  </div>
                 </div>
               ))}
               {isTyping && <div style={{fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic'}}>Huellitas AI está escribiendo...</div>}

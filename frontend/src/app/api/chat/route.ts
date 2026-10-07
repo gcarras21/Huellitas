@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     
     Reglas MUY IMPORTANTES:
     1. Sé EXTREMADAMENTE conciso y directo. Responde en 1 o 2 párrafos cortos como máximo.
-    2. Cuando recomiendes a un perro, DEBES incluir su foto en tu respuesta usando una etiqueta HTML válida de imagen con su 'photo_url'. Ejemplo: <br/><img src="URL" style="width: 250px; border-radius: 12px; margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+    2. Cuando recomiendes a un perro, DEBES agregar SIEMPRE al final de tu respuesta la etiqueta especial [DOG_CARD: NombreExactoDelPerro]. Por ejemplo, si recomiendas a Felipe, escribe al final: [DOG_CARD: Felipe]. ESTÁ ESTRICTAMENTE PROHIBIDO USAR ETIQUETAS HTML <img> PARA FOTOS.
     3. Sé muy conversacional y empático. Puedes usar **negritas** para enfatizar.
     `;
 
