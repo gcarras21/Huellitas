@@ -33,7 +33,7 @@ export async function POST(request: Request) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: "llama-3.1-70b-versatile",
+                model: "openai/gpt-oss-20b",
                 messages: [
                     { role: "system", content: system_prompt },
                     { role: "user", content: message }
