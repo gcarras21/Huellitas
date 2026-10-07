@@ -562,12 +562,12 @@ export default function ClientDashboard() {
                 </button>
               </div>
             </div>
-            <style dangerouslySetInnerHTML={{__html: \`
+            <style dangerouslySetInnerHTML={{__html: `
               @keyframes slideUp {
                 from { opacity: 0; transform: translateY(20px) scale(0.95); }
                 to { opacity: 1; transform: translateY(0) scale(1); }
               }
-            \`}} />
+            `}} />
           </div>
         )}
 
