@@ -91,8 +91,8 @@ export default function UsuariosPage() {
     const r = role?.toLowerCase() || 'client';
     if (r === 'admin') return { bg: '#f3f0ff', color: '#722ed1', text: 'ADMINISTRADOR', icon: <Shield size={12}/> };
     if (r === 'supervisor') return { bg: '#f6ffed', color: '#52c41a', text: 'SUPERVISOR', icon: <Shield size={12}/> };
-    if (r === 'staff') return { bg: '#e6f7ff', color: '#1890ff', text: 'STAFF', icon: <Users size={12}/> };
-    return { bg: '#f1f5f9', color: '#64748b', text: 'CLIENTE', icon: null };
+    if (r === 'staff' || r === 'employee') return { bg: '#e6f7ff', color: '#1890ff', text: 'STAFF', icon: <Users size={12}/> };
+    return { bg: '#f1f5f9', color: '#64748b', text: 'ADOPTANTE', icon: null };
   };
 
   return (

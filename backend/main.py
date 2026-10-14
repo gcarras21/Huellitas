@@ -56,9 +56,9 @@ async def chat_with_ai(request: ChatRequest):
     """
 
     try:
-        # 3. Llamar a LLaMA a través de Groq
+        # 3. Llamar al LLM a través de Groq
         completion = groq_client.chat.completions.create(
-            model="qwen/qwen3.8-27b",
+            model="openai/gpt-oss-20b",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": request.message}

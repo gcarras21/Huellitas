@@ -13,11 +13,55 @@ export default function InternalLayout({ children }: { children: React.ReactNode
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Dynamic user profile state
+  const [currentUser, setCurrentUser] = useState({
+    name: 'Usuario',
+    role: 'Staff',
+    initials: 'U',
+  });
+
+  // AI Assistant chat state
+  const [aiInput, setAiInput] = useState('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiMessages, setAiMessages] = useState<Array<{ role: 'user' | 'ai'; text: string }>>([
+    { role: 'ai', text: '¡Hola! Soy Huellitas AI para el equipo. Puedo ayudarte con dudas sobre perritos en adopción, estado de salud o solicitudes.' }
+  ]);
+
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    if (typeof window !== 'undefined') {
+      localStorage.clear();
+      sessionStorage.clear();
+    }
     router.push('/login');
+  };
+
+  const handleAiSend = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!aiInput.trim() || isAiLoading) return;
+    const userText = aiInput.trim();
+    setAiInput('');
+    setAiMessages(prev => [...prev, { role: 'user', text: userText }]);
+    setIsAiLoading(true);
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userText }),
+      });
+      const data = await res.json();
+      if (data.reply) {
+        setAiMessages(prev => [...prev, { role: 'ai', text: data.reply }]);
+      } else {
+        setAiMessages(prev => [...prev, { role: 'ai', text: 'No pude obtener una respuesta en este momento.' }]);
+      }
+    } catch (err) {
+      setAiMessages(prev => [...prev, { role: 'ai', text: 'Ups, ocurrió un error conectando con el servicio de IA.' }]);
+    }
+    setIsAiLoading(false);
   };
 
   useEffect(() => {
@@ -27,16 +71,38 @@ export default function InternalLayout({ children }: { children: React.ReactNode
         return;
       }
       
-      supabase.from('profiles').select('role').eq('id', session.user.id).single().then(({data}) => {
+      supabase.from('profiles').select('role, full_name').eq('id', session.user.id).single().then(({data}) => {
         const staffRoles = ['admin', 'supervisor', 'staff', 'employee'];
         if (!data || !staffRoles.includes(data.role)) {
           router.push('/mi-cuenta');
+          return;
         }
+
+        const roleLabels: Record<string, string> = {
+          admin: 'Administrador',
+          supervisor: 'Supervisor',
+          staff: 'Staff Operativo',
+          employee: 'Personal Staff',
+        };
+        const name = data.full_name || session.user.email?.split('@')[0] || 'Usuario';
+        const initials = name
+          .split(' ')
+          .filter(Boolean)
+          .map((n: string) => n[0])
+          .slice(0, 2)
+          .join('')
+          .toUpperCase() || 'U';
+
+        setCurrentUser({
+          name,
+          role: roleLabels[data.role] || 'Staff',
+          initials,
+        });
       });
     });
 
-    // Fetch a couple of dogs to show in the AI panel dynamically
-    supabase.from('dogs').select('*').limit(2).then(({ data }) => {
+    // Fetch dogs to show in the AI panel dynamically
+    supabase.from('dogs').select('*').limit(3).then(({ data }) => {
       if (data) setAiDogs(data);
     });
   }, []);
@@ -106,14 +172,29 @@ export default function InternalLayout({ children }: { children: React.ReactNode
         </div>
 
         <div className="user-profile" style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
-          <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-            <img className="avatar" src="https://i.pravatar.cc/150?img=11" alt="Gabriel" />
-            <div>
-              <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>Gabriel</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Administrador</div>
+          <div style={{display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0}}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--primary-orange-light)',
+              color: 'var(--primary-orange)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 700,
+              fontSize: '0.9rem',
+              border: '2px solid #fed7aa',
+              flexShrink: 0,
+            }}>
+              {currentUser.initials}
+            </div>
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{ fontWeight: 600, fontSize: '0.9rem', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{currentUser.name}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{currentUser.role}</div>
             </div>
           </div>
-          <button onClick={handleLogout} style={{background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px'}} title="Cerrar Sesión">
+          <button onClick={handleLogout} style={{background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px', flexShrink: 0}} title="Cerrar Sesión">
             <LogOut size={18} />
           </button>
         </div>
@@ -138,51 +219,49 @@ export default function InternalLayout({ children }: { children: React.ReactNode
         </div>
         
         <div className="ai-chat-area">
-          <div className="chat-bubble user">
-            ¿Qué perros están disponibles para adopción y son buenos con los niños?
-          </div>
-          
-          <div className="chat-bubble ai">
-            Basado en la información de la plataforma, aquí hay perros que podrían ser ideales para familias con niños:
-            
-            {/* Dynamic Mini cards inside chat */}
-            <div style={{display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px'}}>
-              {aiDogs.length === 0 ? (
-                <div style={{fontSize: '0.75rem', color: 'var(--text-muted)'}}>No hay perros registrados aún para recomendar.</div>
-              ) : (
-                aiDogs.map(dog => (
-                  <div key={dog.id} style={{minWidth: '110px', border: '1px solid #eee', borderRadius: '8px', padding: '8px', backgroundColor: '#fff'}}>
-                    {dog.photo_url ? (
-                      <img src={dog.photo_url} style={{width: '100%', height: '60px', objectFit: 'cover', borderRadius: '4px', marginBottom: '8px'}} />
-                    ) : (
-                      <div style={{width: '100%', height: '60px', backgroundColor: '#ddd', borderRadius: '4px', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Dog size={16} color="#aaa"/></div>
-                    )}
-                    <div style={{fontSize: '0.8rem', fontWeight: 600}}>{dog.name}</div>
-                    <div style={{fontSize: '0.65rem', color: '#777'}}>{dog.age_months ? `${dog.age_months} meses` : 'Edad desconcida'}<br/>{dog.temperament || 'Calm'}</div>
-                  </div>
-                ))
+          {aiMessages.map((msg, index) => (
+            <div key={index} className={`chat-bubble ${msg.role}`}>
+              {msg.text}
+              
+              {/* Show mini dog cards only on the first welcome message if available */}
+              {index === 0 && aiDogs.length > 0 && (
+                <div style={{display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px'}}>
+                  {aiDogs.map(dog => (
+                    <div key={dog.id} style={{minWidth: '110px', border: '1px solid #eee', borderRadius: '8px', padding: '8px', backgroundColor: '#fff'}}>
+                      {dog.photo_url ? (
+                        <img src={dog.photo_url} alt={dog.name} style={{width: '100%', height: '60px', objectFit: 'cover', borderRadius: '4px', marginBottom: '8px'}} />
+                      ) : (
+                        <div style={{width: '100%', height: '60px', backgroundColor: '#ddd', borderRadius: '4px', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Dog size={16} color="#aaa"/></div>
+                      )}
+                      <div style={{fontSize: '0.8rem', fontWeight: 600}}>{dog.name}</div>
+                      <div style={{fontSize: '0.65rem', color: '#777'}}>{dog.age_months ? `${dog.age_months} meses` : 'Edad desconocida'}<br/>{dog.temperament || 'Dócil'}</div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
-          </div>
-          
-          <div className="chat-bubble user">
-            ¿Qué vacunas necesita {aiDogs[0]?.name || 'Luna'} y cuándo?
-          </div>
-          <div className="chat-bubble ai">
-            {aiDogs[0]?.name || 'Luna'} tiene las siguientes vacunas pendientes:
-            <ul style={{margin: '8px 0 8px 16px', fontSize: '0.85rem'}}>
-              <li><strong style={{color: 'var(--urgent-red)'}}>Vacuna contra la rabia</strong> - hoy</li>
-              <li><strong style={{color: 'var(--primary-orange)'}}>Refuerzo DHPP</strong> - en 2 semanas</li>
-            </ul>
-            ¿Quieres que lo agregue a tus tareas?
-          </div>
+          ))}
+
+          {isAiLoading && (
+            <div className="chat-bubble ai" style={{fontStyle: 'italic', color: 'var(--text-muted)'}}>
+              Huellitas AI está consultando la información...
+            </div>
+          )}
         </div>
 
         <div className="ai-input-area">
-          <div className="ai-input-wrapper">
-            <input type="text" placeholder="Pregunta algo sobre los perros..." />
-            <button><Send size={16} /></button>
-          </div>
+          <form onSubmit={handleAiSend} className="ai-input-wrapper">
+            <input 
+              type="text" 
+              value={aiInput}
+              onChange={(e) => setAiInput(e.target.value)}
+              placeholder="Pregunta algo sobre los perros..." 
+              disabled={isAiLoading}
+            />
+            <button type="submit" disabled={isAiLoading} title="Enviar pregunta">
+              <Send size={16} />
+            </button>
+          </form>
         </div>
       </aside>
 

@@ -9,7 +9,9 @@ import styles from './page.module.css';
 export default function PublicLanding() {
   const [dogs, setDogs] = useState<any[]>([]);
   const [session, setSession] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string>('adoptante');
+  const [userRole, setUserRole] = useState<string>('client');
+  
+  const isStaff = ['admin', 'supervisor', 'staff', 'employee'].includes(userRole);
   
   useEffect(() => {
     // Verificar si hay sesión iniciada
@@ -17,7 +19,7 @@ export default function PublicLanding() {
       if (session) {
         setSession(session);
         supabase.from('profiles').select('role').eq('id', session.user.id).single().then(({data}) => {
-          if (data) setUserRole(data.role);
+          if (data?.role) setUserRole(data.role);
         });
       }
     });
@@ -41,7 +43,7 @@ export default function PublicLanding() {
           <Link href="#" className={styles.navLink}>Nosotros</Link>
           <Link href="#" className={styles.navLink}>Donar</Link>
           {session ? (
-            <Link href={userRole === 'admin' ? '/dashboard' : '/mi-cuenta'} className={styles.loginBtn}>Mi Portal</Link>
+            <Link href={isStaff ? '/dashboard' : '/mi-cuenta'} className={styles.loginBtn}>Mi Portal</Link>
           ) : (
             <Link href="/login" className={styles.loginBtn}>Iniciar Sesión</Link>
           )}
@@ -89,7 +91,7 @@ export default function PublicLanding() {
                 </div>
 
                 {/* Si tiene sesión, va a su portal, si no al login */}
-                <Link href={session ? (userRole === 'admin' ? '/dashboard' : '/mi-cuenta') : "/login"} className={styles.adoptBtn}>
+                <Link href={session ? (isStaff ? '/dashboard' : '/mi-cuenta') : "/login"} className={styles.adoptBtn}>
                   <Heart size={18} style={{display:'inline', verticalAlign:'middle', marginRight:'6px'}}/>
                   ¡Quiero Adoptarlo!
                 </Link>
