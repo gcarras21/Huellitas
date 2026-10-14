@@ -28,7 +28,8 @@ export default function InternalLayout({ children }: { children: React.ReactNode
       }
       
       supabase.from('profiles').select('role').eq('id', session.user.id).single().then(({data}) => {
-        if (data && data.role === 'adoptante') {
+        const staffRoles = ['admin', 'supervisor', 'staff', 'employee'];
+        if (!data || !staffRoles.includes(data.role)) {
           router.push('/mi-cuenta');
         }
       });
