@@ -30,6 +30,54 @@
   transition: width 0.3s ease;
 }
 
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 2rem 0;
+}
+
+.stepBadge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.logoutBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.logoutBtn:hover {
+  background-color: #fee2e2;
+  color: var(--urgent-red);
+}
+
+.errorBanner {
+  background-color: var(--urgent-red-light);
+  color: var(--urgent-red);
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  margin: 0 2rem 1rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .header {
   padding: 3rem 2rem 1rem;
   text-align: center;

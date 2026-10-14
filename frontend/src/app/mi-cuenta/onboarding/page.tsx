@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { Dog, Home, User, CheckCircle } from 'lucide-react';
+import { Dog, Home, User, CheckCircle, LogOut, AlertCircle } from 'lucide-react';
 import styles from './onboarding.module.css';
 
 export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const [formData, setFormData] = useState({
     housing_type: 'Departamento / Espacio chico',
     has_kids: false,
@@ -22,23 +23,39 @@ export default function OnboardingPage() {
     experience_level: 'Soy primerizo (No tengo experiencia)',
   });
 
-  // Verify if already has preferences
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    if (typeof window !== 'undefined') {
+      localStorage.clear();
+      sessionStorage.clear();
+    }
+    router.push('/login');
+  };
+
+  // Verify if session exists and is valid on Supabase Auth server
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) router.push('/login');
-      else {
-        const searchParams = new URLSearchParams(window.location.search);
-        if (searchParams.get('edit') !== 'true') {
-          supabase.from('user_preferences').select('user_id').eq('user_id', session.user.id).single().then(({ data }) => {
-            if (data) router.push('/mi-cuenta'); // Already completed
-          });
-        }
+    supabase.auth.getUser().then(({ data: { user }, error }) => {
+      if (error || !user) {
+        handleLogout();
+        return;
+      }
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams.get('edit') !== 'true') {
+        supabase.from('user_preferences').select('user_id').eq('user_id', user.id).single().then(({ data }) => {
+          if (data) router.push('/mi-cuenta'); // Already completed
+        });
       }
     });
   }, [router]);
 
-  const handleNext = () => setStep(s => Math.min(s + 1, 4));
-  const handlePrev = () => setStep(s => Math.max(s - 1, 1));
+  const handleNext = () => {
+    setErrorMsg('');
+    setStep(s => Math.min(s + 1, 4));
+  };
+  const handlePrev = () => {
+    setErrorMsg('');
+    setStep(s => Math.max(s - 1, 1));
+  };
 
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
@@ -59,13 +76,17 @@ export default function OnboardingPage() {
 
   const handleSubmit = async () => {
     setLoading(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+    setErrorMsg('');
+    const { data: { user }, error: userErr } = await supabase.auth.getUser();
+    if (userErr || !user) {
+      handleLogout();
+      return;
+    }
 
     const { adults_only, ...dbData } = formData;
 
     const { error } = await supabase.from('user_preferences').upsert({
-      user_id: session.user.id,
+      user_id: user.id,
       ...dbData
     });
 
@@ -73,7 +94,12 @@ export default function OnboardingPage() {
     if (!error) {
       router.push('/mi-cuenta');
     } else {
-      alert('Error guardando preferencias: ' + error.message);
+      // If user was deleted or foreign key constraint failed, clean up session
+      if (error.message.includes('foreign key constraint') || error.message.includes('user_preferences_user_id_fkey')) {
+        await handleLogout();
+      } else {
+        setErrorMsg('Error guardando preferencias: ' + error.message);
+      }
     }
   };
 
@@ -84,11 +110,25 @@ export default function OnboardingPage() {
           <div className={styles.progressBar} style={{ width: `${(step / 4) * 100}%` }}></div>
         </div>
 
+        <div className={styles.topBar}>
+          <span className={styles.stepBadge}>Paso {step} de 4</span>
+          <button onClick={handleLogout} className={styles.logoutBtn} title="Cerrar Sesión">
+            <LogOut size={15} /> Cerrar Sesión
+          </button>
+        </div>
+
         <div className={styles.header}>
           <Dog size={32} color="var(--primary-orange)" />
           <h1>Huellita Match AI</h1>
           <p>Ayúdanos a encontrar tu compañero ideal respondiendo unas breves preguntas.</p>
         </div>
+
+        {errorMsg && (
+          <div className={styles.errorBanner}>
+            <AlertCircle size={18} />
+            <span>{errorMsg}</span>
+          </div>
+        )}
 
         <div className={styles.stepContent}>
           {step === 1 && (
