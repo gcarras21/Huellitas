@@ -140,6 +140,8 @@ export default function LoginPage() {
           setError('Este correo electrónico ya está registrado. Por favor inicia sesión.');
         } else if (signUpError.message.includes('Password should be at least')) {
           setError('La contraseña debe tener al menos 6 caracteres.');
+        } else if (signUpError.message.toLowerCase().includes('rate limit')) {
+          setError('Límite de correos por hora alcanzado en Supabase (máx. 3-4/hora). Desactiva "Confirm email" en el panel de Supabase para registro instantáneo.');
         } else {
           setError(signUpError.message);
         }
