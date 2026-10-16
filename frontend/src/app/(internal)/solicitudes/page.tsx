@@ -196,7 +196,8 @@ export default function SolicitudesPage() {
       .eq('id', reqId);
 
     if (error) {
-      alert('Error al actualizar fase de la solicitud.');
+      console.error('Error al actualizar fase:', error);
+      alert('Error al actualizar fase de la solicitud: ' + (error.message || 'Error desconocido'));
       fetchRequests();
     }
   };

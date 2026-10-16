@@ -260,7 +260,8 @@ export default function ClientDashboard() {
 
   const getStepProgress = (status: string) => {
     if (status === 'pending') return 1;
-    if (status === 'interview') return 2;
+    if (status === 'reviewing') return 2;
+    if (status === 'interview') return 3;
     if (status === 'approved') return 4;
     if (status === 'rejected') return -1;
     return 1;
