@@ -162,31 +162,99 @@ export default function ClientDashboard() {
   };
 
   const renderChatMessage = (content: string) => {
-    const parts = content.split(/(\[DOG_CARD:.*?\])/g);
+    const parts = content.split(/(\[\s*DOG_CARD:\s*[^\]]+?\s*\])/gi);
     return parts.map((part, index) => {
-      if (part.startsWith('[DOG_CARD:') && part.endsWith(']')) {
-        const dogNameMatch = part.match(/\[DOG_CARD:\s*(.*?)\]/);
-        if (dogNameMatch) {
-          const dogName = dogNameMatch[1].trim();
-          const dog = allDogs.find(d => d.name.toLowerCase() === dogName.toLowerCase());
-          if (dog) {
-            return (
-              <div key={index} style={{marginTop: '1rem', marginBottom: '0.5rem', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', backgroundColor: 'white', maxWidth: '240px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)'}}>
-                <img src={dog.photo_url || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop"} alt={dog.name} style={{width: '100%', height: '180px', objectFit: 'contain', backgroundColor: '#f8fafc'}} />
-                <div style={{padding: '1rem', textAlign: 'center'}}>
-                  <h4 style={{margin: '0 0 0.5rem 0', color: '#1e293b', fontSize: '1.1rem'}}>{dog.name}</h4>
-                  <button onClick={() => setSelectedDog(dog)} style={{backgroundColor: 'var(--primary-orange-light)', color: 'var(--primary-orange)', border: 'none', padding: '0.5rem 0.8rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', width: '100%', transition: 'background-color 0.2s'}}>
-                    Ver más información
-                  </button>
-                </div>
+      const match = part.match(/^\[\s*DOG_CARD:\s*([^\]]+?)\s*\]$/i);
+      if (match) {
+        const rawDogName = match[1].trim().replace(/[.,;:!]+$/, '').toLowerCase();
+        const dog = allDogs.find(d => {
+          const dName = (d.name || '').trim().toLowerCase();
+          return dName === rawDogName || dName.includes(rawDogName) || rawDogName.includes(dName);
+        });
+
+        if (dog) {
+          return (
+            <div 
+              key={index} 
+              style={{
+                marginTop: '1rem', 
+                marginBottom: '0.5rem', 
+                border: '1px solid #e2e8f0', 
+                borderRadius: '14px', 
+                overflow: 'hidden', 
+                backgroundColor: 'white', 
+                maxWidth: '250px', 
+                boxShadow: '0 4px 12px rgba(0,0,0,0.06)'
+              }}
+            >
+              <div style={{ position: 'relative', width: '100%', height: '170px', backgroundColor: '#f8fafc' }}>
+                <img 
+                  src={dog.photo_url || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop"} 
+                  alt={dog.name} 
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                />
+                {dog.size && (
+                  <span style={{
+                    position: 'absolute',
+                    bottom: '8px',
+                    left: '8px',
+                    backgroundColor: 'rgba(15, 23, 42, 0.7)',
+                    color: 'white',
+                    fontSize: '0.7rem',
+                    fontWeight: 600,
+                    padding: '2px 8px',
+                    borderRadius: '8px'
+                  }}>
+                    {dog.size}
+                  </span>
+                )}
               </div>
-            );
-          }
+              <div style={{ padding: '0.9rem', textAlign: 'center' }}>
+                <h4 style={{ margin: '0 0 0.2rem 0', color: '#1e293b', fontSize: '1.1rem', fontWeight: 700 }}>{dog.name.trim()}</h4>
+                <p style={{ margin: '0 0 0.75rem 0', color: '#64748b', fontSize: '0.8rem' }}>{dog.breed || 'Mestizo'}</p>
+                <button 
+                  onClick={() => setSelectedDog(dog)} 
+                  style={{
+                    backgroundColor: 'var(--primary-orange-light)', 
+                    color: 'var(--primary-orange)', 
+                    border: 'none', 
+                    padding: '0.55rem 0.9rem', 
+                    borderRadius: '8px', 
+                    fontWeight: 600, 
+                    fontSize: '0.85rem', 
+                    cursor: 'pointer', 
+                    width: '100%', 
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--primary-orange)';
+                    e.currentTarget.style.color = 'white';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--primary-orange-light)';
+                    e.currentTarget.style.color = 'var(--primary-orange)';
+                  }}
+                >
+                  Ver más información
+                </button>
+              </div>
+            </div>
+          );
         }
         return null;
       }
       
-      return <span key={index} dangerouslySetInnerHTML={{ __html: part.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>') }} style={{display: 'inline-block'}} />;
+      if (!part) return null;
+
+      return (
+        <span 
+          key={index} 
+          dangerouslySetInnerHTML={{ 
+            __html: part.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>') 
+          }} 
+          style={{display: 'inline-block'}} 
+        />
+      );
     });
   };
 

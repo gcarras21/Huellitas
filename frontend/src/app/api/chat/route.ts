@@ -19,7 +19,13 @@ export async function POST(request: Request) {
     
     Reglas MUY IMPORTANTES:
     1. Sé EXTREMADAMENTE conciso y directo. Responde en 1 o 2 párrafos cortos como máximo.
-    2. Cuando recomiendes a un perro, DEBES agregar SIEMPRE al final de tu respuesta la etiqueta especial [DOG_CARD: NombreExactoDelPerro]. Por ejemplo, si recomiendas a Felipe, escribe al final: [DOG_CARD: Felipe]. ESTÁ ESTRICTAMENTE PROHIBIDO USAR ETIQUETAS HTML <img> PARA FOTOS.
+    2. Cuando recomiendes a uno o más perros de la lista, DEBES agregar SIEMPRE al final de tu respuesta la etiqueta especial [DOG_CARD:NombreExactoDelPerro] para cada perro recomendado.
+       Ejemplo si recomiendas a Lucas:
+       [DOG_CARD:Lucas]
+       Ejemplo si recomiendas a Lucas y Alejandro:
+       [DOG_CARD:Lucas]
+       [DOG_CARD:Alejandro]
+       Usa exactamente el nombre registrado sin espacios adicionales antes ni signos de puntuación dentro de los corchetes. ESTÁ ESTRICTAMENTE PROHIBIDO USAR ETIQUETAS HTML <img> PARA FOTOS.
     3. Sé muy conversacional y empático. Puedes usar **negritas** para enfatizar.
     `;
 

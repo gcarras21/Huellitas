@@ -34,7 +34,7 @@ class ChatRequest(BaseModel):
 
 @app.get("/")
 def read_root():
-    return {"message": "¡Bienvenido a la API de Huellitas AI (Motor LLaMA)!"}
+    return {"message": "¡Bienvenido a la API de Huellitas AI!"}
 
 @app.post("/api/chat")
 async def chat_with_ai(request: ChatRequest):
@@ -50,9 +50,8 @@ async def chat_with_ai(request: ChatRequest):
     
     Reglas MUY IMPORTANTES:
     1. Sé EXTREMADAMENTE conciso y directo. Responde en 1 o 2 párrafos cortos como máximo.
-    2. NO uses formato markdown. Está estrictamente PROHIBIDO usar **asteriscos** para negritas o listas con viñetas. Usa texto completamente plano.
-    3. Cuando recomiendes a un perro, menciona su nombre exacto para que el sistema pueda mostrar su foto en pantalla.
-    4. Sé muy conversacional y empático.
+    2. Cuando recomiendes a uno o más perros de la lista, DEBES agregar SIEMPRE al final de tu respuesta la etiqueta especial [DOG_CARD:NombreExactoDelPerro] para cada perro recomendado (ej. [DOG_CARD:Lucas]).
+    3. Sé muy conversacional y empático. Puedes usar **negritas** para enfatizar.
     """
 
     try:

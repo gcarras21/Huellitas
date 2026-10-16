@@ -64,6 +64,73 @@ export default function InternalLayout({ children }: { children: React.ReactNode
     setIsAiLoading(false);
   };
 
+  const renderAiInternalMessage = (content: string) => {
+    const parts = content.split(/(\[\s*DOG_CARD:\s*[^\]]+?\s*\])/gi);
+    return parts.map((part, index) => {
+      const match = part.match(/^\[\s*DOG_CARD:\s*([^\]]+?)\s*\]$/i);
+      if (match) {
+        const rawDogName = match[1].trim().replace(/[.,;:!]+$/, '').toLowerCase();
+        const dog = aiDogs.find(d => {
+          const dName = (d.name || '').trim().toLowerCase();
+          return dName === rawDogName || dName.includes(rawDogName) || rawDogName.includes(dName);
+        });
+
+        if (dog) {
+          return (
+            <div key={index} style={{
+              marginTop: '10px',
+              border: '1px solid #e2e8f0',
+              borderRadius: '10px',
+              overflow: 'hidden',
+              backgroundColor: 'white',
+              maxWidth: '220px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+            }}>
+              <img 
+                src={dog.photo_url || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop"} 
+                alt={dog.name} 
+                style={{ width: '100%', height: '120px', objectFit: 'cover' }} 
+              />
+              <div style={{ padding: '8px', textAlign: 'center' }}>
+                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#1e293b' }}>{dog.name.trim()}</div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '6px' }}>{dog.breed || 'Mestizo'}</div>
+                <Link 
+                  href="/perros" 
+                  style={{
+                    display: 'block',
+                    backgroundColor: 'var(--primary-orange-light)',
+                    color: 'var(--primary-orange)',
+                    textDecoration: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    fontWeight: 600,
+                    fontSize: '0.75rem'
+                  }}
+                >
+                  Ver en catálogo
+                </Link>
+              </div>
+            </div>
+          );
+        }
+        return null;
+      }
+
+      if (!part) return null;
+
+      return (
+        <span 
+          key={index}
+          dangerouslySetInnerHTML={{ 
+            __html: part
+              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+              .replace(/\n/g, '<br/>') 
+          }} 
+        />
+      );
+    });
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
@@ -102,7 +169,7 @@ export default function InternalLayout({ children }: { children: React.ReactNode
     });
 
     // Fetch dogs to show in the AI panel dynamically
-    supabase.from('dogs').select('*').limit(3).then(({ data }) => {
+    supabase.from('dogs').select('*').then(({ data }) => {
       if (data) setAiDogs(data);
     });
   }, []);
@@ -221,12 +288,12 @@ export default function InternalLayout({ children }: { children: React.ReactNode
         <div className="ai-chat-area">
           {aiMessages.map((msg, index) => (
             <div key={index} className={`chat-bubble ${msg.role}`}>
-              {msg.text}
+              {msg.role === 'ai' ? renderAiInternalMessage(msg.text) : msg.text}
               
               {/* Show mini dog cards only on the first welcome message if available */}
               {index === 0 && aiDogs.length > 0 && (
                 <div style={{display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px'}}>
-                  {aiDogs.map(dog => (
+                  {aiDogs.slice(0, 3).map(dog => (
                     <div key={dog.id} style={{minWidth: '110px', border: '1px solid #eee', borderRadius: '8px', padding: '8px', backgroundColor: '#fff'}}>
                       {dog.photo_url ? (
                         <img src={dog.photo_url} alt={dog.name} style={{width: '100%', height: '60px', objectFit: 'cover', borderRadius: '4px', marginBottom: '8px'}} />
