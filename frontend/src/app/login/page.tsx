@@ -89,7 +89,8 @@ export default function LoginPage() {
           await supabase.from('profiles').upsert({
             id: authData.user.id,
             full_name: nameToAssign,
-            role: roleToAssign
+            role: roleToAssign,
+            email: authData.user.email
           });
           currentRole = roleToAssign;
         }
@@ -151,7 +152,8 @@ export default function LoginPage() {
           await supabase.from('profiles').upsert({
             id: data.user.id,
             full_name: formData.fullName,
-            role: assignedRole
+            role: assignedRole,
+            email: formData.email
           });
         }
 

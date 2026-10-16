@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { LayoutDashboard, Dog, ClipboardList, Home, HeartPulse, Calendar, BarChart2, FileText, Settings, HelpCircle, Send, LogOut, Users, X, Bot, Globe, Sparkles, Menu } from 'lucide-react';
+import NotificationBell from '@/components/NotificationBell';
 
 export default function InternalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -269,6 +270,56 @@ export default function InternalLayout({ children }: { children: React.ReactNode
 
       {/* --- MAIN DASHBOARD CONTENT --- */}
       <main className="main-content">
+        {/* Global Staff Header with Date, Notification Bell, and AI Trigger */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingBottom: '1.25rem',
+          marginBottom: '1.75rem',
+          borderBottom: '1px solid var(--border-color)',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Panel Staff &gt;</span>
+            <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-dark)' }}>
+              {navItems.find(i => i.href === pathname)?.name || 'Dashboard'}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="tool-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-muted)', backgroundColor: '#fff', border: '1px solid var(--border-color)', padding: '6px 12px', borderRadius: '8px' }}>
+              <Calendar size={15} color="var(--primary-orange)" />
+              <span style={{ textTransform: 'capitalize' }}>
+                {new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </span>
+            </div>
+
+            <NotificationBell />
+
+            <button
+              onClick={() => setIsAiOpen(!isAiOpen)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                backgroundColor: isAiOpen ? 'var(--primary-orange)' : 'var(--primary-orange-light)',
+                color: isAiOpen ? 'white' : 'var(--primary-orange)',
+                border: 'none',
+                padding: '7px 14px',
+                borderRadius: '8px',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              <Bot size={16} /> Huellitas AI
+            </button>
+          </div>
+        </div>
+
         {children}
       </main>
 

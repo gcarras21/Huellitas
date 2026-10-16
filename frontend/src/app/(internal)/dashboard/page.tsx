@@ -72,19 +72,10 @@ export default function DashboardPage() {
 
   return (
     <>
-      <header className="top-header">
-        <div className="greeting">
-          <h1>¡Buenos días, {userName}! 👋</h1>
-          <p>Este es el resumen de lo más importante hoy.</p>
-        </div>
-        <div className="header-tools">
-          <div className="tool-badge"><Calendar size={16} color="var(--text-muted)" /> {new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-          <div style={{position: 'relative', cursor: 'pointer'}}>
-            <Bell size={20} color="var(--text-dark)" />
-            {recentApps.filter(a => a.status === 'pending').length > 0 && <span style={{position: 'absolute', top: -4, right: -4, backgroundColor: 'var(--urgent-red)', width: 10, height: 10, borderRadius: '50%'}}></span>}
-          </div>
-        </div>
-      </header>
+      <div className="greeting" style={{ marginBottom: '1.75rem' }}>
+        <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-dark)', margin: 0 }}>¡Buenos días, {userName}! 👋</h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', margin: '4px 0 0 0' }}>Este es el resumen operativo de lo más importante hoy.</p>
+      </div>
 
       <div className="bento-grid">
         
